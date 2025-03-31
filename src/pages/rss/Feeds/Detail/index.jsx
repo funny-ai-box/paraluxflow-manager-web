@@ -8,7 +8,7 @@ import {
 import { Button, Card, Col, Drawer, Row, Spin, Table, message } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import ReactJson from 'react-json-view';
+import JsonViewer from '@/components/JsonViewer';
 import { useParams } from 'react-router-dom';
 
 import { ProDescriptions } from '@ant-design/pro-components';
@@ -277,16 +277,22 @@ export default function FeedDetail() {
             showTotal: (total) => `Total ${total} items`,
           }} loading={loading}
           onChange={handleTableChange} />
-        <Drawer
-          title="XML to JSON Data"
-          placement="right"
-          closable={false}
-          onClose={() => setShowDrawer(false)}
-          visible={showDrawer}
-          width={720}
-        >
-          <ReactJson src={testData} theme="monokai" collapsed={2} enableClipboard={false} />
-        </Drawer>
+       <Drawer
+  title="XML to JSON Data"
+  placement="right"
+  closable={false}
+  onClose={() => setShowDrawer(false)}
+  open={showDrawer}
+  width={720}
+>
+  <JsonViewer 
+    src={testData} 
+    theme="light" 
+    collapsed={2} 
+    enableClipboard={true}
+    displayDataTypes={true}
+  />
+</Drawer>
 
         <Drawer
           title="HTML Content"

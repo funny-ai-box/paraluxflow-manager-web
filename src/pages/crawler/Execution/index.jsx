@@ -33,8 +33,8 @@ const StatusTag = ({ status }) => {
   return <Tag color={color}>{text}</Tag>;
 };
 
-export default () => {
-  const [articleExcutions, setArticleExcutions] = useState<TableListItem[]>([]);
+const ContentExecution = () => {
+  const [articleExcutions, setArticleExcutions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [current, setCurrent] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -131,3 +131,5 @@ export default () => {
     </>
   );
 };
+
+export default ContentExecution;
