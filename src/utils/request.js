@@ -12,7 +12,7 @@ const ErrorShowType = {
 
 // Create axios instance
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '',
+  baseURL: '',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

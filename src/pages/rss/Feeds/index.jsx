@@ -1,4 +1,4 @@
-import { fetchRssFeeds, updateFeedStatus, getGroupList } from '@/services/rss';
+import { fetchRssFeeds, updateFeedStatus } from '@/services/rss';
 import { useEffect, useState } from 'react';
 import { Select } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
@@ -8,7 +8,7 @@ import CreateNewFeed from './components/CreateNewFeed';
 
 const Feeds = () => {
   const [feeds, setFeeds] = useState([]);
-  const [group, setGroup] = useState([]);
+
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     const loadFeeds = async () => {
@@ -16,9 +16,7 @@ const Feeds = () => {
       const response = await fetchRssFeeds({});
       setFeeds(response.data); // Assuming 'data' contains your feeds
       setLoading(false);
-      const { data } = await getGroupList();
-      const groupList = data.map((e) => ({ value: e.id, label: e.title }));
-      setGroup(groupList);
+
     };
     loadFeeds();
   }, []);
@@ -78,24 +76,7 @@ const Feeds = () => {
       dataIndex: 'description',
       width: 180,
     },
-    {
-      title: 'Group',
-      dataIndex: 'group_id',
-      width: 180,
-      render: (_, record) => {
-        if (record.group) {
-          return record.group.title;
-        } else {
-          return '-';
-        }
-      },
-      renderFormItem: (_, { fieldProps }) => {
-        return (
-          // value 和 onchange 会通过 form 自动注入。
-          <Select {...fieldProps} allowClear options={group} />
-        );
-      },
-    },
+
     {
       title: 'Link',
       dataIndex: 'url',
