@@ -1,7 +1,29 @@
-// src/layouts/MainLayout.jsx
+// src/layouts/MainLayout.jsx - Updated with new navigation items
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined } from '@ant-design/icons';
+import {
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  UserOutlined,
+  HomeOutlined,
+  ReadOutlined,
+  FileTextOutlined,
+  FileSearchOutlined,
+  AppstoreOutlined,
+  RobotOutlined,
+  ScheduleOutlined,
+  BarChartOutlined,
+  SettingOutlined,
+  BulbOutlined,
+  ToolOutlined,
+  LineChartOutlined,
+  DashboardOutlined,
+  AlertOutlined,
+  ClusterOutlined,
+  ApiOutlined,
+  FileAddOutlined,
+  EditOutlined
+} from '@ant-design/icons';
 import { Layout, Menu, Button, theme, Avatar, Breadcrumb } from 'antd';
 
 const { Header, Sider, Content } = Layout;
@@ -10,12 +32,12 @@ const { Header, Sider, Content } = Layout;
 const menuItems = [
   {
     key: '/',
-    icon: <UserOutlined />,
+    icon: <HomeOutlined />,
     label: 'Home',
   },
   {
     key: 'rss-manager',
-    icon: <UserOutlined />,
+    icon: <ReadOutlined />,
     label: 'RSS Management',
     children: [
       {
@@ -29,8 +51,23 @@ const menuItems = [
     ],
   },
   {
+    key: 'templates',
+    icon: <FileAddOutlined />,
+    label: 'Source Templates',
+    children: [
+      {
+        key: '/templates',
+        label: 'Template List',
+      },
+      {
+        key: '/templates/create',
+        label: 'Create Template',
+      },
+    ],
+  },
+  {
     key: 'crawler',
-    icon: <UserOutlined />,
+    icon: <FileSearchOutlined />,
     label: 'Crawler',
     children: [
       {
@@ -43,7 +80,81 @@ const menuItems = [
       },
     ],
   },
+  {
+    key: 'recommendation',
+    icon: <BulbOutlined />,
+    label: 'Recommendation',
+    children: [
+      {
+        key: '/recommendation/rules',
+        label: 'Rules Management',
+      },
+      {
+        key: '/recommendation/content',
+        label: 'Content Adjustment',
+      },
+    ],
+  },
+  {
+    key: 'ai',
+    icon: <RobotOutlined />,
+    label: 'AI Summary',
+    children: [
+      {
+        key: '/ai/models',
+        label: 'Model Configuration',
+      },
+      {
+        key: '/ai/templates',
+        label: 'Summary Templates',
+      },
+      {
+        key: '/ai/feedback',
+        label: 'User Feedback',
+      },
+    ],
+  },
+  {
+    key: 'tasks',
+    icon: <ScheduleOutlined />,
+    label: 'Tasks',
+    children: [
+      {
+        key: '/tasks/scheduled',
+        label: 'Scheduled Tasks',
+      },
+      {
+        key: '/tasks/monitoring',
+        label: 'Monitoring Dashboard',
+      },
+    ],
+  },
+  {
+    key: 'statistics',
+    icon: <BarChartOutlined />,
+    label: 'Statistics',
+    children: [
+      {
+        key: '/statistics/data-analysis',
+        label: 'Data Analysis',
+      },
+    ],
+  },
+  {
+    key: 'system',
+    icon: <SettingOutlined />,
+    label: 'System',
+    children: [
+      {
+        key: '/system/logs-alerts',
+        label: 'Logs & Alerts',
+      },
+    ],
+  },
 ];
+
+// Generate breadcrumb items
+// src/layouts/MainLayout.jsx (Continued)
 
 // Generate breadcrumb items
 const generateBreadcrumb = (pathname) => {
@@ -86,6 +197,23 @@ const MainLayout = () => {
     return [];
   };
   
+  // Find the selected key (current page)
+  const getSelectedKey = () => {
+    // For most pages, the pathname is the key
+    // For dynamic routes, we need to handle special cases
+    if (pathname.match(/^\/templates\/edit\/\d+$/)) {
+      return '/templates/edit';
+    } else if (pathname.match(/^\/templates\/detail\/\d+$/)) {
+      return '/templates/detail';
+    } else if (pathname.match(/^\/templates\/script\/\d+$/)) {
+      return '/templates/script';
+    } else if (pathname.match(/^\/rss-manager\/feeds\/detail\/\d+$/)) {
+      return '/rss-manager/feeds/detail';
+    } else {
+      return pathname;
+    }
+  };
+  
   // Handle menu click
   const handleMenuClick = ({ key }) => {
     navigate(key);
@@ -110,9 +238,23 @@ const MainLayout = () => {
           zIndex: 1000,
         }}
         theme="dark"
+        width={260}
       >
-        <div className="logo" style={{ height: 64, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <h2 style={{ color: token.colorPrimary, margin: 0, fontSize: collapsed ? '16px' : '20px' }}>
+        <div className="logo" style={{ 
+          height: 64, 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          color: token.colorPrimary,
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+        }}>
+          <h2 style={{ 
+            color: token.colorPrimary, 
+            margin: 0, 
+            fontSize: collapsed ? '16px' : '20px',
+            fontWeight: 'bold',
+            letterSpacing: '1px'
+          }}>
             {collapsed ? 'PF' : 'ParaluxFlow'}
           </h2>
         </div>
@@ -120,12 +262,13 @@ const MainLayout = () => {
           theme="dark"
           mode="inline"
           defaultOpenKeys={getOpenKeys()}
-          selectedKeys={[pathname]}
+          selectedKeys={[getSelectedKey()]}
           items={menuItems}
           onClick={handleMenuClick}
+          style={{ borderRight: 0 }}
         />
       </Sider>
-      <Layout style={{ marginLeft: collapsed ? 80 : 200, transition: 'margin-left 0.2s' }}>
+      <Layout style={{ marginLeft: collapsed ? 80 : 260, transition: 'margin-left 0.2s' }}>
         <Header
           style={{
             padding: 0,
@@ -149,7 +292,19 @@ const MainLayout = () => {
               height: 64,
             }}
           />
-          <div style={{ paddingRight: 24 }}>
+          <div style={{ paddingRight: 24, display: 'flex', alignItems: 'center' }}>
+            <Button 
+              type="text" 
+              icon={<AlertOutlined />} 
+              style={{ marginRight: 16 }}
+              onClick={() => navigate('/system/logs-alerts')}
+            />
+            <Button 
+              type="text" 
+              icon={<SettingOutlined />} 
+              style={{ marginRight: 16 }}
+              onClick={() => navigate('/system')}
+            />
             <Avatar icon={<UserOutlined />} />
           </div>
         </Header>
