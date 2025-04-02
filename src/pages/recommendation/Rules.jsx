@@ -40,7 +40,7 @@ import { CSS } from '@dnd-kit/utilities';
 const { Option } = Select;
 const { TextArea } = Input;
 
-// Sortable table row component
+// 可排序表格行组件
 const SortableTableRow = ({ children, ...props }) => {
   const {
     attributes,
@@ -91,11 +91,11 @@ const RecommendationRules = () => {
       if (response.code === 200) {
         setRules(response.data);
       } else {
-        message.error('Failed to fetch recommendation rules');
+        message.error('获取推荐规则失败');
       }
     } catch (error) {
-      console.error('Error fetching rules:', error);
-      message.error('An error occurred while loading rules');
+      console.error('获取规则时出错:', error);
+      message.error('加载规则时发生错误');
     } finally {
       setLoading(false);
     }
@@ -150,15 +150,15 @@ const RecommendationRules = () => {
       }
 
       if (response.code === 200) {
-        message.success(`Rule ${editingRule ? 'updated' : 'created'} successfully`);
+        message.success(`规则${editingRule ? '更新' : '创建'}成功`);
         closeDrawer();
         fetchRules();
       } else {
-        message.error(response.message || `Failed to ${editingRule ? 'update' : 'create'} rule`);
+        message.error(response.message || `规则${editingRule ? '更新' : '创建'}失败`);
       }
     } catch (error) {
-      console.error(`Error ${editingRule ? 'updating' : 'creating'} rule:`, error);
-      message.error(`An error occurred while ${editingRule ? 'updating' : 'creating'} the rule`);
+      console.error(`规则${editingRule ? '更新' : '创建'}时出错:`, error);
+      message.error(`规则${editingRule ? '更新' : '创建'}时发生错误`);
     }
   };
 
@@ -166,14 +166,14 @@ const RecommendationRules = () => {
     try {
       const response = await deleteRecommendationRule(id);
       if (response.code === 200) {
-        message.success('Rule deleted successfully');
+        message.success('规则删除成功');
         fetchRules();
       } else {
-        message.error(response.message || 'Failed to delete rule');
+        message.error(response.message || '规则删除失败');
       }
     } catch (error) {
-      console.error('Error deleting rule:', error);
-      message.error('An error occurred while deleting the rule');
+      console.error('删除规则时出错:', error);
+      message.error('删除规则时发生错误');
     }
   };
 
@@ -194,7 +194,7 @@ const RecommendationRules = () => {
       
       setRules(newRules);
       
-      // Update priorities on the server
+      // 在服务器上更新优先级
       try {
         const newPriorities = newRules.map((rule, index) => ({
           id: rule.id,
@@ -203,25 +203,25 @@ const RecommendationRules = () => {
         
         const response = await reorderRecommendationRules(newPriorities);
         if (response.code !== 200) {
-          message.error('Failed to save new rule order');
-          fetchRules(); // Refresh to get original order
+          message.error('保存新规则顺序失败');
+          fetchRules(); // 刷新以获取原始顺序
         }
       } catch (error) {
-        console.error('Error reordering rules:', error);
-        message.error('An error occurred while reordering rules');
-        fetchRules(); // Refresh to get original order
+        console.error('重新排序规则时出错:', error);
+        message.error('重新排序规则时发生错误');
+        fetchRules(); // 刷新以获取原始顺序
       }
     }
   };
 
   const columns = [
     {
-      title: 'Priority',
+      title: '优先级',
       dataIndex: 'priority',
       key: 'priority',
       width: 100,
       sorter: (a, b) => a.priority - b.priority,
-      render: (text, record) => (
+      render: (text) => (
         <Space>
           {sortMode && <SortAscendingOutlined style={{ cursor: 'grab', color: '#999' }} />}
           {text}
@@ -229,32 +229,32 @@ const RecommendationRules = () => {
       ),
     },
     {
-      title: 'Name',
+      title: '名称',
       dataIndex: 'name',
       key: 'name',
       render: (text, record) => (
         <Space>
           <span>{text}</span>
-          {!record.is_active && <Tag color="red">Disabled</Tag>}
+          {!record.is_active && <Tag color="red">禁用</Tag>}
         </Space>
       ),
     },
     {
-      title: 'Factor',
+      title: '因子',
       dataIndex: 'factor',
       key: 'factor',
       width: 150,
       render: (text) => <Tag color="blue">{text}</Tag>,
     },
     {
-      title: 'Weight',
+      title: '权重',
       dataIndex: 'weight',
       key: 'weight',
       width: 100,
       render: (text) => text.toFixed(2),
     },
     {
-      title: 'Condition',
+      title: '条件',
       dataIndex: 'condition_type',
       key: 'condition_type',
       width: 300,
@@ -285,7 +285,7 @@ const RecommendationRules = () => {
       },
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       width: 150,
       render: (_, record) => (
@@ -297,10 +297,10 @@ const RecommendationRules = () => {
             disabled={sortMode}
           />
           <Popconfirm
-            title="Are you sure you want to delete this rule?"
+            title="确定要删除此规则吗？"
             onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
+            okText="是"
+            cancelText="否"
             disabled={sortMode}
           >
             <Button 
@@ -318,7 +318,7 @@ const RecommendationRules = () => {
   return (
     <div>
       <Card
-        title="Recommendation Rules"
+        title="推荐规则"
         extra={
           <Space>
             <Button
@@ -326,7 +326,7 @@ const RecommendationRules = () => {
               icon={sortMode ? <SortDescendingOutlined /> : <SortAscendingOutlined />}
               onClick={toggleSortMode}
             >
-              {sortMode ? "Save Order" : "Reorder Rules"}
+              {sortMode ? "保存顺序" : "重新排序"}
             </Button>
             <Button
               type="primary"
@@ -334,7 +334,7 @@ const RecommendationRules = () => {
               onClick={() => showDrawer()}
               disabled={sortMode}
             >
-              Add Rule
+              添加规则
             </Button>
           </Space>
         }
@@ -372,7 +372,7 @@ const RecommendationRules = () => {
       </Card>
 
       <Drawer
-        title={editingRule ? "Edit Recommendation Rule" : "Create Recommendation Rule"}
+        title={editingRule ? "编辑推荐规则" : "创建推荐规则"}
         width={600}
         onClose={closeDrawer}
         visible={drawerVisible}
@@ -380,10 +380,10 @@ const RecommendationRules = () => {
         footer={
           <div style={{ textAlign: 'right' }}>
             <Button style={{ marginRight: 8 }} onClick={closeDrawer}>
-              Cancel
+              取消
             </Button>
             <Button type="primary" onClick={() => form.submit()}>
-              {editingRule ? 'Update' : 'Create'}
+              {editingRule ? '更新' : '创建'}
             </Button>
           </div>
         }
@@ -395,123 +395,123 @@ const RecommendationRules = () => {
         >
           <Form.Item
             name="name"
-            label="Rule Name"
-            rules={[{ required: true, message: 'Please enter a rule name' }]}
+            label="规则名称"
+            rules={[{ required: true, message: '请输入规则名称' }]}
           >
-            <Input placeholder="Enter rule name" />
+            <Input placeholder="输入规则名称" />
           </Form.Item>
 
           <Form.Item
             name="description"
-            label="Description"
+            label="描述"
           >
-            <TextArea rows={3} placeholder="Enter description" />
+            <TextArea rows={3} placeholder="输入描述" />
           </Form.Item>
 
           <Form.Item
             name="factor"
-            label="Recommendation Factor"
-            rules={[{ required: true, message: 'Please select a factor' }]}
+            label="推荐因子"
+            rules={[{ required: true, message: '请选择因子' }]}
           >
-            <Select placeholder="Select factor">
-              <Option value="recency">Recency</Option>
-              <Option value="relevance">Relevance</Option>
-              <Option value="popularity">Popularity</Option>
-              <Option value="engagement">User Engagement</Option>
-              <Option value="content_quality">Content Quality</Option>
-              <Option value="source_trustworthiness">Source Trustworthiness</Option>
-              <Option value="personalization">Personalization</Option>
+            <Select placeholder="选择因子">
+              <Option value="recency">最近性</Option>
+              <Option value="relevance">相关性</Option>
+              <Option value="popularity">流行度</Option>
+              <Option value="engagement">用户参与度</Option>
+              <Option value="content_quality">内容质量</Option>
+              <Option value="source_trustworthiness">来源可信度</Option>
+              <Option value="personalization">个性化</Option>
             </Select>
           </Form.Item>
 
-          <Divider>Condition</Divider>
+          <Divider>条件</Divider>
 
           <Form.Item
             name="condition_type"
-            label="Condition Type"
-            tooltip="Simple conditions use field-operator-value format. Expression conditions use Python-like syntax."
+            label="条件类型"
+            tooltip="简单条件使用字段-操作符-值格式。表达式条件使用类似Python的语法。"
           >
             <Select 
-              placeholder="Select condition type" 
+              placeholder="选择条件类型" 
               onChange={(value) => setConditionType(value)}
             >
-              <Option value="simple">Simple Condition</Option>
-              <Option value="expression">Expression</Option>
+              <Option value="simple">简单条件</Option>
+              <Option value="expression">表达式</Option>
             </Select>
           </Form.Item>
 
           {conditionType === 'simple' ? (
             <Form.Item 
               name="condition" 
-              label="Condition"
-              tooltip="Defines when this rule should be applied"
+              label="条件"
+              tooltip="定义何时应用此规则"
             >
               <Input.Group compact>
                 <Form.Item
                   name={['condition', 'field']}
                   noStyle
-                  rules={[{ required: true, message: 'Field is required' }]}
+                  rules={[{ required: true, message: '字段是必填项' }]}
                 >
-                  <Select style={{ width: '33%' }} placeholder="Field">
-                    <Option value="category">Category</Option>
-                    <Option value="source">Source</Option>
-                    <Option value="day_of_week">Day of Week</Option>
-                    <Option value="hour_of_day">Hour of Day</Option>
-                    <Option value="contains_image">Contains Image</Option>
-                    <Option value="word_count">Word Count</Option>
+                  <Select style={{ width: '33%' }} placeholder="字段">
+                    <Option value="category">类别</Option>
+                    <Option value="source">来源</Option>
+                    <Option value="day_of_week">星期几</Option>
+                    <Option value="hour_of_day">小时</Option>
+                    <Option value="contains_image">包含图片</Option>
+                    <Option value="word_count">字数</Option>
                   </Select>
                 </Form.Item>
                 <Form.Item
                   name={['condition', 'operator']}
                   noStyle
-                  rules={[{ required: true, message: 'Operator is required' }]}
+                  rules={[{ required: true, message: '操作符是必填项' }]}
                 >
-                  <Select style={{ width: '33%' }} placeholder="Operator">
-                    <Option value="=">equals</Option>
-                    <Option value="!=">not equals</Option>
-                    <Option value=">">greater than</Option>
-                    <Option value="<">less than</Option>
-                    <Option value=">=">greater than or equal</Option>
-                    <Option value="<=">less than or equal</Option>
-                    <Option value="in">in</Option>
-                    <Option value="not in">not in</Option>
+                  <Select style={{ width: '33%' }} placeholder="操作符">
+                    <Option value="=">等于</Option>
+                    <Option value="!=">不等于</Option>
+                    <Option value=">">大于</Option>
+                    <Option value="<">小于</Option>
+                    <Option value=">=">大于等于</Option>
+                    <Option value="<=">小于等于</Option>
+                    <Option value="in">包含</Option>
+                    <Option value="not in">不包含</Option>
                   </Select>
                 </Form.Item>
                 <Form.Item
                   name={['condition', 'value']}
                   noStyle
-                  rules={[{ required: true, message: 'Value is required' }]}
+                  rules={[{ required: true, message: '值是必填项' }]}
                 >
-                  <Input style={{ width: '34%' }} placeholder="Value" />
+                  <Input style={{ width: '34%' }} placeholder="值" />
                 </Form.Item>
               </Input.Group>
             </Form.Item>
           ) : (
             <Form.Item
               name="condition_expression"
-              label="Expression"
-              tooltip="Use Python-like expressions with variables: category, source, day_of_week, hour_of_day, etc."
+              label="表达式"
+              tooltip="使用类似Python的表达式，变量包括：category, source, day_of_week, hour_of_day等。"
               rules={[
                 { 
                   required: conditionType === 'expression', 
-                  message: 'Please enter a condition expression' 
+                  message: '请输入条件表达式' 
                 }
               ]}
             >
               <TextArea
                 rows={4}
-                placeholder="e.g. category == 'technology' and day_of_week in [0, 1, 2, 3, 4]"
+                placeholder="例如：category == 'technology' and day_of_week in [0, 1, 2, 3, 4]"
               />
             </Form.Item>
           )}
 
-          <Divider>Configuration</Divider>
+          <Divider>配置</Divider>
 
           <Form.Item
             name="priority"
-            label="Priority"
-            tooltip="Rules are applied in priority order (lower numbers are applied first)"
-            rules={[{ required: true, message: 'Please enter a priority' }]}
+            label="优先级"
+            tooltip="规则按优先级顺序应用（数字越小优先级越高）"
+            rules={[{ required: true, message: '请输入优先级' }]}
           >
             <InputNumber min={1} max={1000} style={{ width: '100%' }} />
           </Form.Item>
@@ -520,13 +520,13 @@ const RecommendationRules = () => {
             name="weight"
             label={
               <span>
-                Weight
-                <Tooltip title="The weight factor to apply to the score when this rule matches">
+                权重
+                <Tooltip title="当规则匹配时应用于分数的权重因子">
                   <QuestionCircleOutlined style={{ marginLeft: 8 }} />
                 </Tooltip>
               </span>
             }
-            rules={[{ required: true, message: 'Please enter a weight' }]}
+            rules={[{ required: true, message: '请输入权重' }]}
           >
             <InputNumber 
               min={0.1} 
@@ -540,7 +540,7 @@ const RecommendationRules = () => {
 
           <Form.Item
             name="is_active"
-            label="Active"
+            label="是否启用"
             valuePropName="checked"
           >
             <Switch />

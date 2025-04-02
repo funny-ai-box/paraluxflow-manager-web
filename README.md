@@ -988,12 +988,6 @@ export async function testSummaryTemplate(id) {
  *   }
  * }
  */
-export async function fetchUserFeedback(templateId) {
-  return request(`/api/v1/ai/feedback`, {
-    method: 'GET',
-    params: { template_id: templateId }
-  });
-}
 
 /**
  * 获取反馈分析数据

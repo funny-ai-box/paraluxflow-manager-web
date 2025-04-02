@@ -33,121 +33,118 @@ const menuItems = [
   {
     key: '/',
     icon: <HomeOutlined />,
-    label: 'Home',
+    label: '首页',
   },
   {
     key: 'rss-manager',
     icon: <ReadOutlined />,
-    label: 'RSS Management',
+    label: 'RSS 管理',
     children: [
       {
         key: '/rss-manager/feeds',
-        label: 'Feeds',
+        label: '订阅源',
       },
       {
         key: '/rss-manager/articles',
-        label: 'Articles',
+        label: '文章',
       },
     ],
   },
   {
     key: 'templates',
     icon: <FileAddOutlined />,
-    label: 'Source Templates',
+    label: '资源模板',
     children: [
       {
         key: '/templates',
-        label: 'Template List',
+        label: '模板列表',
       },
       {
         key: '/templates/create',
-        label: 'Create Template',
+        label: '创建模板',
       },
     ],
   },
   {
     key: 'crawler',
     icon: <FileSearchOutlined />,
-    label: 'Crawler',
+    label: '爬虫',
     children: [
       {
         key: '/crawler/execution',
-        label: 'Execution Tasks',
+        label: '执行任务',
       },
       {
         key: '/crawler/content-execution',
-        label: 'Content Fetching',
+        label: '内容抓取',
       },
     ],
   },
   {
     key: 'recommendation',
     icon: <BulbOutlined />,
-    label: 'Recommendation',
+    label: '推荐',
     children: [
       {
         key: '/recommendation/rules',
-        label: 'Rules Management',
+        label: '规则管理',
       },
       {
         key: '/recommendation/content',
-        label: 'Content Adjustment',
+        label: '内容调整',
       },
     ],
   },
   {
     key: 'ai',
     icon: <RobotOutlined />,
-    label: 'AI Summary',
+    label: 'AI 摘要',
     children: [
       {
         key: '/ai/models',
-        label: 'Model Configuration',
+        label: '模型配置',
       },
       {
         key: '/ai/templates',
-        label: 'Summary Templates',
+        label: '摘要模板',
       },
-      {
-        key: '/ai/feedback',
-        label: 'User Feedback',
-      },
+  
     ],
   },
   {
     key: 'tasks',
     icon: <ScheduleOutlined />,
-    label: 'Tasks',
+    label: '任务',
     children: [
       {
         key: '/tasks/scheduled',
-        label: 'Scheduled Tasks',
+        label: '定时任务',
       },
       {
         key: '/tasks/monitoring',
-        label: 'Monitoring Dashboard',
+        label: '监控面板',
       },
     ],
   },
   {
     key: 'statistics',
     icon: <BarChartOutlined />,
-    label: 'Statistics',
+    label: '统计',
     children: [
       {
         key: '/statistics/data-analysis',
-        label: 'Data Analysis',
+        label: '数据分析',
       },
     ],
   },
   {
     key: 'system',
     icon: <SettingOutlined />,
-    label: 'System',
+    label: '系统',
     children: [
       {
         key: '/system/logs-alerts',
-        label: 'Logs & Alerts',
+        label: '日志与警报',
       },
     ],
   },
@@ -162,7 +159,7 @@ const generateBreadcrumb = (pathname) => {
   
   return [
     {
-      title: <Link to="/">Home</Link>,
+      title: <Link to="/">首页</Link>,
     },
     ...paths.map((path, index) => {
       // Convert path to title (capitalize first letter, replace hyphens with spaces)

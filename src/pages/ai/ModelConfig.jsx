@@ -70,11 +70,11 @@ const ModelConfig = () => {
       if (response.code === 200) {
         setModels(response.data);
       } else {
-        message.error('Failed to fetch AI models');
+        message.error('获取 AI 模型失败');
       }
     } catch (error) {
-      console.error('Error fetching AI models:', error);
-      message.error('An error occurred while loading AI models');
+      console.error('获取 AI 模型时出错:', error);
+      message.error('加载 AI 模型时发生错误');
     } finally {
       setLoading(false);
     }
@@ -86,11 +86,11 @@ const ModelConfig = () => {
       if (response.code === 200) {
         setContentTypes(response.data);
       } else {
-        message.error('Failed to fetch content types');
+        message.error('获取内容类型失败');
       }
     } catch (error) {
-      console.error('Error fetching content types:', error);
-      message.error('An error occurred while loading content types');
+      console.error('获取内容类型时出错:', error);
+      message.error('加载内容类型时发生错误');
     }
   };
   
@@ -146,15 +146,15 @@ const ModelConfig = () => {
       }
       
       if (response.code === 200) {
-        message.success(`Model ${editingModel ? 'updated' : 'created'} successfully`);
+        message.success(`模型${editingModel ? '更新' : '创建'}成功`);
         closeDrawer();
         fetchModels();
       } else {
-        message.error(response.message || `Failed to ${editingModel ? 'update' : 'create'} model`);
+        message.error(response.message || `模型${editingModel ? '更新' : '创建'}失败`);
       }
     } catch (error) {
-      console.error(`Error ${editingModel ? 'updating' : 'creating'} model:`, error);
-      message.error(`An error occurred while ${editingModel ? 'updating' : 'creating'} the model`);
+      console.error(`模型${editingModel ? '更新' : '创建'}时出错:`, error);
+      message.error(`模型${editingModel ? '更新' : '创建'}时发生错误`);
     }
   };
   
@@ -162,14 +162,14 @@ const ModelConfig = () => {
     try {
       const response = await deleteAIModel(id);
       if (response.code === 200) {
-        message.success('Model deleted successfully');
+        message.success('模型删除成功');
         fetchModels();
       } else {
-        message.error(response.message || 'Failed to delete model');
+        message.error(response.message || '删除模型失败');
       }
     } catch (error) {
-      console.error('Error deleting model:', error);
-      message.error('An error occurred while deleting the model');
+      console.error('删除模型时出错:', error);
+      message.error('删除模型时发生错误');
     }
   };
   
@@ -206,67 +206,67 @@ const ModelConfig = () => {
         const response = await updateContentTypeModelMapping(values.content_type_id, formattedValues);
         
         if (response.code === 200) {
-          message.success('Content type mapping updated successfully');
+          message.success('内容类型映射更新成功');
           closeMappingDrawer();
           fetchContentTypesData();
         } else {
-          message.error(response.message || 'Failed to update content type mapping');
+          message.error(response.message || '更新内容类型映射失败');
         }
       } catch (error) {
-        console.error('Error updating content type mapping:', error);
-        message.error('An error occurred while updating the content type mapping');
+        console.error('更新内容类型映射时出错:', error);
+        message.error('更新内容类型映射时发生错误');
       }
     };
     
     const modelColumns = [
       {
-        title: 'Name',
+        title: '名称',
         dataIndex: 'name',
         key: 'name',
       },
       {
-        title: 'Provider',
+        title: '提供商',
         dataIndex: 'provider',
         key: 'provider',
         render: (text) => {
           const colorMap = {
-            'OpenAI': 'green',
-            'Anthropic': 'blue',
-            'Google': 'orange',
-            'Alibaba': 'red',
-            'Hugging Face': 'purple',
-            'Custom': 'default',
+            'OpenAI': '绿色',
+            'Anthropic': '蓝色',
+            'Google': '橙色',
+            'Alibaba': '红色',
+            'Hugging Face': '紫色',
+            'Custom': '默认',
           };
-          return <Tag color={colorMap[text] || 'default'}>{text}</Tag>;
+          return <Tag color={colorMap[text] || '默认'}>{text}</Tag>;
         },
       },
       {
-        title: 'Model Key',
+        title: '模型密钥',
         dataIndex: 'model_key',
         key: 'model_key',
       },
       {
-        title: 'Max Tokens',
+        title: '最大令牌数',
         dataIndex: 'max_tokens',
         key: 'max_tokens',
       },
       {
-        title: 'Temperature',
+        title: '温度',
         dataIndex: 'temperature',
         key: 'temperature',
       },
       {
-        title: 'Status',
+        title: '状态',
         dataIndex: 'status',
         key: 'status',
         render: (status) => (
-          <Tag color={status === 1 ? 'green' : 'red'}>
-            {status === 1 ? 'Active' : 'Inactive'}
+          <Tag color={status === 1 ? '绿色' : '红色'}>
+            {status === 1 ? '启用' : '禁用'}
           </Tag>
         ),
       },
       {
-        title: 'Actions',
+        title: '操作',
         key: 'actions',
         render: (_, record) => (
           <Space>
@@ -276,10 +276,10 @@ const ModelConfig = () => {
               onClick={() => showDrawer(record)}
             />
             <Popconfirm
-              title="Are you sure you want to delete this model?"
+              title="确定要删除此模型吗？"
               onConfirm={() => handleDelete(record.id)}
-              okText="Yes"
-              cancelText="No"
+              okText="是"
+              cancelText="否"
             >
               <Button
                 icon={<DeleteOutlined />}
@@ -294,44 +294,44 @@ const ModelConfig = () => {
     
     const contentTypeColumns = [
       {
-        title: 'Content Type',
+        title: '内容类型',
         dataIndex: 'name',
         key: 'name',
       },
       {
-        title: 'Description',
+        title: '描述',
         dataIndex: 'description',
         key: 'description',
         ellipsis: true,
       },
       {
-        title: 'Assigned Model',
+        title: '分配的模型',
         dataIndex: 'model_name',
         key: 'model_name',
-        render: (text) => text || <Text type="secondary">Not assigned</Text>,
+        render: (text) => text || <Text type="secondary">未分配</Text>,
       },
       {
-        title: 'Summary Strategy',
+        title: '摘要策略',
         dataIndex: 'summarization_strategy',
         key: 'summarization_strategy',
         render: (text) => {
           const strategyMap = {
-            'extractive': { color: 'blue', text: 'Extractive' },
-            'abstractive': { color: 'green', text: 'Abstractive' },
-            'hybrid': { color: 'purple', text: 'Hybrid' },
+            'extractive': { color: '蓝色', text: '抽取式' },
+            'abstractive': { color: '绿色', text: '生成式' },
+            'hybrid': { color: '紫色', text: '混合式' },
           };
-          const { color, text: displayText } = strategyMap[text] || { color: 'default', text: text || 'Not set' };
+          const { color, text: displayText } = strategyMap[text] || { color: '默认', text: text || '未设置' };
           return <Tag color={color}>{displayText}</Tag>;
         },
       },
       {
-        title: 'Max Length',
+        title: '最大长度',
         dataIndex: 'max_summary_length',
         key: 'max_summary_length',
         render: (text) => text || '-',
       },
       {
-        title: 'Actions',
+        title: '操作',
         key: 'actions',
         render: (_, record) => (
           <Button
@@ -339,7 +339,7 @@ const ModelConfig = () => {
             size="small"
             onClick={() => showMappingDrawer(record)}
           >
-            Configure
+            配置
           </Button>
         ),
       },
@@ -352,20 +352,20 @@ const ModelConfig = () => {
             tab={
               <span>
                 <ApiOutlined />
-                AI Models
+                AI 模型
               </span>
             } 
             key="1"
           >
             <Card 
-              title="AI Model Configuration" 
+              title="AI 模型配置" 
               extra={
                 <Button 
                   type="primary" 
                   icon={<PlusOutlined />} 
                   onClick={() => showDrawer()}
                 >
-                  Add Model
+                  添加模型
                 </Button>
               }
             >
@@ -382,24 +382,24 @@ const ModelConfig = () => {
             tab={
               <span>
                 <SettingOutlined />
-                Content Type Mapping
+                内容类型映射
               </span>
             } 
             key="2"
           >
             <Card 
-              title="Content Type Model Mapping" 
+              title="内容类型模型映射" 
               extra={
                 <Button 
                   icon={<SyncOutlined />} 
                   onClick={fetchContentTypesData}
                 >
-                  Refresh
+                  刷新
                 </Button>
               }
             >
               <Text type="secondary" style={{ marginBottom: 16, display: 'block' }}>
-                Configure which AI model processes each content type and the specific parameters for summarization.
+                配置每种内容类型由哪个 AI 模型处理以及摘要的具体参数。
               </Text>
               
               <Table
@@ -413,7 +413,7 @@ const ModelConfig = () => {
         </Tabs>
         
         <Drawer
-          title={editingModel ? "Edit AI Model" : "Add AI Model"}
+          title={editingModel ? "编辑 AI 模型" : "添加 AI 模型"}
           width={600}
           onClose={closeDrawer}
           open={drawerVisible}
@@ -421,10 +421,10 @@ const ModelConfig = () => {
           footer={
             <div style={{ textAlign: 'right' }}>
               <Button style={{ marginRight: 8 }} onClick={closeDrawer}>
-                Cancel
+                取消
               </Button>
               <Button type="primary" onClick={() => form.submit()}>
-                {editingModel ? 'Update' : 'Create'}
+                {editingModel ? '更新' : '创建'}
               </Button>
             </div>
           }
@@ -438,19 +438,19 @@ const ModelConfig = () => {
               <Col span={12}>
                 <Form.Item
                   name="name"
-                  label="Model Name"
-                  rules={[{ required: true, message: 'Please enter model name' }]}
+                  label="模型名称"
+                  rules={[{ required: true, message: '请输入模型名称' }]}
                 >
-                  <Input placeholder="Enter model name" />
+                  <Input placeholder="输入模型名称" />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item
                   name="provider"
-                  label="Provider"
-                  rules={[{ required: true, message: 'Please select provider' }]}
+                  label="提供商"
+                  rules={[{ required: true, message: '请选择提供商' }]}
                 >
-                  <Select placeholder="Select provider">
+                  <Select placeholder="选择提供商">
                     <Option value="OpenAI">OpenAI</Option>
                     <Option value="Anthropic">Anthropic</Option>
                     <Option value="Google">Google</Option>
@@ -466,41 +466,41 @@ const ModelConfig = () => {
               <Col span={12}>
                 <Form.Item
                   name="model_key"
-                  label="Model Key"
-                  rules={[{ required: true, message: 'Please enter model key' }]}
-                  tooltip="The identifier for this model in the provider's API (e.g., gpt-4, claude-2)"
+                  label="模型密钥"
+                  rules={[{ required: true, message: '请输入模型密钥' }]}
+                  tooltip="此模型在提供商 API 中的标识符（例如，gpt-4，claude-2）"
                 >
-                  <Input placeholder="Enter model key" />
+                  <Input placeholder="输入模型密钥" />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item
                   name="api_endpoint"
-                  label="API Endpoint"
-                  rules={[{ required: true, message: 'Please enter API endpoint' }]}
+                  label="API 地址"
+                  rules={[{ required: true, message: '请输入 API 地址' }]}
                 >
-                  <Input placeholder="Enter API endpoint URL" />
+                  <Input placeholder="输入 API 地址" />
                 </Form.Item>
               </Col>
             </Row>
             
             <Form.Item
               name="api_key"
-              label="API Key"
-              tooltip={editingModel ? "Leave blank to keep the current API key" : ""}
-              rules={[{ required: !editingModel, message: 'Please enter API key' }]}
+              label="API 密钥"
+              tooltip={editingModel ? "留空以保持当前 API 密钥" : ""}
+              rules={[{ required: !editingModel, message: '请输入 API 密钥' }]}
             >
-              <Input.Password placeholder={editingModel ? "Enter to change API key" : "Enter API key"} />
+              <Input.Password placeholder={editingModel ? "输入以更改 API 密钥" : "输入 API 密钥"} />
             </Form.Item>
             
-            <Divider>Model Parameters</Divider>
+            <Divider>模型参数</Divider>
             
             <Row gutter={16}>
               <Col span={8}>
                 <Form.Item
                   name="max_tokens"
-                  label="Max Tokens"
-                  rules={[{ required: true, message: 'Please enter max tokens' }]}
+                  label="最大令牌数"
+                  rules={[{ required: true, message: '请输入最大令牌数' }]}
                 >
                   <InputNumber min={1} max={100000} style={{ width: '100%' }} />
                 </Form.Item>
@@ -508,8 +508,8 @@ const ModelConfig = () => {
               <Col span={8}>
                 <Form.Item
                   name="temperature"
-                  label="Temperature"
-                  rules={[{ required: true, message: 'Please enter temperature' }]}
+                  label="温度"
+                  rules={[{ required: true, message: '请输入温度值' }]}
                 >
                   <InputNumber min={0} max={2} step={0.1} style={{ width: '100%' }} />
                 </Form.Item>
@@ -518,7 +518,7 @@ const ModelConfig = () => {
                 <Form.Item
                   name="top_p"
                   label="Top P"
-                  rules={[{ required: true, message: 'Please enter top p value' }]}
+                  rules={[{ required: true, message: '请输入 Top P 值' }]}
                 >
                   <InputNumber min={0} max={1} step={0.1} style={{ width: '100%' }} />
                 </Form.Item>
@@ -527,17 +527,17 @@ const ModelConfig = () => {
             
             <Form.Item
               name="system_prompt"
-              label="Default System Prompt"
-              tooltip="Base instructions given to the model for all requests"
+              label="默认系统提示"
+              tooltip="为所有请求提供给模型的基本指令"
             >
-              <TextArea rows={4} placeholder="Enter default system prompt" />
+              <TextArea rows={4} placeholder="输入默认系统提示" />
             </Form.Item>
             
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
                   name="supports_streaming"
-                  label="Supports Streaming"
+                  label="支持流式传输"
                   valuePropName="checked"
                 >
                   <Switch />
@@ -546,25 +546,25 @@ const ModelConfig = () => {
               <Col span={12}>
                 <Form.Item
                   name="status"
-                  label="Status"
+                  label="状态"
                   valuePropName="checked"
                 >
-                  <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
+                  <Switch checkedChildren="启用" unCheckedChildren="禁用" />
                 </Form.Item>
               </Col>
             </Row>
             
             <Form.Item
               name="description"
-              label="Description"
+              label="描述"
             >
-              <TextArea rows={3} placeholder="Enter model description" />
+              <TextArea rows={3} placeholder="输入模型描述" />
             </Form.Item>
           </Form>
         </Drawer>
         
         <Drawer
-          title="Configure Content Type Processing"
+          title="配置内容类型处理"
           width={600}
           onClose={closeMappingDrawer}
           open={mappingDrawerVisible}
@@ -572,10 +572,10 @@ const ModelConfig = () => {
           footer={
             <div style={{ textAlign: 'right' }}>
               <Button style={{ marginRight: 8 }} onClick={closeMappingDrawer}>
-                Cancel
+                取消
               </Button>
               <Button type="primary" onClick={() => mappingForm.submit()}>
-                Save
+                保存
               </Button>
             </div>
           }
@@ -597,10 +597,10 @@ const ModelConfig = () => {
               
               <Form.Item
                 name="model_id"
-                label="AI Model"
-                rules={[{ required: true, message: 'Please select an AI model' }]}
+                label="AI 模型"
+                rules={[{ required: true, message: '请选择 AI 模型' }]}
               >
-                <Select placeholder="Select AI model">
+                <Select placeholder="选择 AI 模型">
                   {models.map(model => (
                     <Option key={model.id} value={model.id}>
                       {model.name} ({model.provider})
@@ -611,27 +611,27 @@ const ModelConfig = () => {
               
               <Form.Item
                 name="summarization_strategy"
-                label="Summarization Strategy"
-                rules={[{ required: true, message: 'Please select a summarization strategy' }]}
+                label="摘要策略"
+                rules={[{ required: true, message: '请选择摘要策略' }]}
               >
                 <Radio.Group>
                   <Space direction="vertical">
                     <Radio value="extractive">
                       <Space>
-                        <span>Extractive</span>
-                        <Text type="secondary">Extract key sentences from original text</Text>
+                        <span>抽取式</span>
+                        <Text type="secondary">从原文中提取关键句</Text>
                       </Space>
                     </Radio>
                     <Radio value="abstractive">
                       <Space>
-                        <span>Abstractive</span>
-                        <Text type="secondary">Generate new text that captures the meaning</Text>
+                        <span>生成式</span>
+                        <Text type="secondary">生成捕捉含义的新文本</Text>
                       </Space>
                     </Radio>
                     <Radio value="hybrid">
                       <Space>
-                        <span>Hybrid</span>
-                        <Text type="secondary">Combine extractive and abstractive approaches</Text>
+                        <span>混合式</span>
+                        <Text type="secondary">结合抽取式和生成式方法</Text>
                       </Space>
                     </Radio>
                   </Space>
@@ -642,9 +642,9 @@ const ModelConfig = () => {
                 <Col span={12}>
                   <Form.Item
                     name="max_summary_length"
-                    label="Max Summary Length"
-                    rules={[{ required: true, message: 'Please enter maximum summary length' }]}
-                    tooltip="Maximum number of words in the generated summary"
+                    label="最大摘要长度"
+                    rules={[{ required: true, message: '请输入最大摘要长度' }]}
+                    tooltip="生成摘要的最大字数"
                   >
                     <InputNumber min={50} max={1000} style={{ width: '100%' }} />
                   </Form.Item>
@@ -652,9 +652,9 @@ const ModelConfig = () => {
                 <Col span={12}>
                   <Form.Item
                     name="include_images"
-                    label="Include Images"
+                    label="包含图片"
                     valuePropName="checked"
-                    tooltip="Whether to include images from the original content in the summary"
+                    tooltip="是否在摘要中包含原始内容中的图片"
                   >
                     <Switch />
                   </Form.Item>
@@ -663,27 +663,27 @@ const ModelConfig = () => {
               
               <Form.Item
                 name="include_links"
-                label="Include Links"
+                label="包含链接"
                 valuePropName="checked"
-                tooltip="Whether to include hyperlinks from the original content in the summary"
+                tooltip="是否在摘要中包含原始内容中的超链接"
               >
                 <Switch />
               </Form.Item>
               
               <Form.Item
                 name="custom_prompt"
-                label="Custom Prompt Template"
-                tooltip="Custom instructions for this content type (overrides the default system prompt)"
+                label="自定义提示模板"
+                tooltip="此内容类型的自定义指令（覆盖默认系统提示）"
               >
                 <TextArea 
                   rows={4} 
-                  placeholder="Enter custom prompt template for this content type"
+                  placeholder="输入自定义提示模板"
                 />
               </Form.Item>
               
               <div style={{ marginTop: 8 }}>
                 <Text type="secondary">
-                  Use {'{content}'} placeholder to indicate where the original content should be inserted in the prompt.
+                  使用 {'{content}'} 占位符表示原始内容在提示中的插入位置。
                 </Text>
               </div>
             </Form>

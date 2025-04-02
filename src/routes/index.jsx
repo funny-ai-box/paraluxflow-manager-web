@@ -1,4 +1,3 @@
-// src/routes/index.jsx
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import {
@@ -7,24 +6,24 @@ import {
   FileTextOutlined,
 } from '@ant-design/icons';
 
-// Import layouts
+// 导入布局
 import MainLayout from '../layouts/MainLayout';
 
-// Import pages
+// 导入页面
 import Welcome from '../pages/Welcome';
 import NotFoundPage from '../pages/404';
 
-// RSS Pages
+// RSS 页面
 import Feeds from '../pages/rss/Feeds';
 import FeedDetail from '../pages/rss/Feeds/Detail';
 import Articles from '../pages/rss/Articles';
 
-// Crawler Pages
+// 爬虫页面
 import Execution from '../pages/crawler/Execution';
 import ContentExecution from '../pages/crawler/ContentExecution';
 
 /**
- * Unified route configuration used to generate both route table and navigation menu
+ * 统一的路由配置，用于生成路由表和导航菜单
  */
 export const routes = [
   {
@@ -32,36 +31,36 @@ export const routes = [
     component: MainLayout,
     layout: 'main',
     redirect: '/welcome',
-    menu: null, // Not shown in menu as it's a layout container
+    menu: null, // 不在菜单中显示，因为它是布局容器
     children: [
       {
         path: 'welcome',
         component: Welcome,
         menu: {
           icon: <HomeOutlined />,
-          label: 'Home',
+          label: '首页',
         },
       },
       {
         path: 'rss-manager',
-        component: null, // No dedicated component, just a container for child routes
+        component: null, // 没有专门的组件，仅作为子路由的容器
         redirect: '/rss-manager/feeds',
         menu: {
           icon: <ReadOutlined />,
-          label: 'RSS Management',
+          label: 'RSS 管理',
         },
         children: [
           {
             path: 'feeds',
             component: Feeds,
             menu: {
-              label: 'Feeds',
+              label: '订阅源',
             },
             children: [
               {
                 path: 'detail/:id',
                 component: FeedDetail,
-                menu: null, // Detail page not shown in menu
+                menu: null, // 详情页不在菜单中显示
               },
             ],
           },
@@ -69,7 +68,7 @@ export const routes = [
             path: 'articles',
             component: Articles,
             menu: {
-              label: 'Articles',
+              label: '文章',
             },
           },
         ],
@@ -80,21 +79,21 @@ export const routes = [
         redirect: '/crawler/execution',
         menu: {
           icon: <FileTextOutlined />,
-          label: 'Crawler',
+          label: '爬虫',
         },
         children: [
           {
             path: 'execution',
             component: Execution,
             menu: {
-              label: 'Execution Tasks',
+              label: '执行任务',
             },
           },
           {
             path: 'content-execution',
             component: ContentExecution,
             menu: {
-              label: 'Content Fetching',
+              label: '内容抓取',
             },
           },
         ],
@@ -102,17 +101,17 @@ export const routes = [
       {
         path: '*',
         component: NotFoundPage,
-        menu: null, // Not shown in menu
+        menu: null, // 不在菜单中显示
       },
     ],
   },
 ];
 
 /**
- * Recursively generate menu items
- * @param {Array} routes - Route configuration
- * @param {String} parentPath - Parent path
- * @returns {Array} - Menu items
+ * 递归生成菜单项
+ * @param {Array} routes - 路由配置
+ * @param {String} parentPath - 父路径
+ * @returns {Array} - 菜单项
  */
 export const generateMenuItems = (routes, parentPath = '') => {
   if (!routes) return [];
@@ -120,7 +119,7 @@ export const generateMenuItems = (routes, parentPath = '') => {
   return routes
     .filter(route => route.menu !== null && !route.hideInMenu)
     .map(route => {
-      // Build full path
+      // 构建完整路径
       const routePath = route.path || '';
       const fullPath = parentPath 
         ? routePath.startsWith('/')
@@ -128,13 +127,13 @@ export const generateMenuItems = (routes, parentPath = '') => {
           : `${parentPath}/${routePath}`
         : routePath;
       
-      // Basic menu item
+      // 基本菜单项
       const menuItem = {
         key: fullPath,
         ...(route.menu || {}),
       };
       
-      // Handle children
+      // 处理子菜单
       if (route.children && route.children.length > 0) {
         const childMenuItems = generateMenuItems(route.children, fullPath);
         if (childMenuItems.length > 0) {

@@ -37,10 +37,8 @@ import {
   createSummaryTemplate, 
   updateSummaryTemplate, 
   deleteSummaryTemplate,
-  testSummaryTemplate,
-  fetchUserFeedback
+  testSummaryTemplate  
 } from '@/services/ai';
-import HtmlContentViewer from '@/pages/rss/Feeds/components/HtmlContentViewer';
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -58,27 +56,18 @@ const SummaryTemplates = () => {
   const [testResult, setTestResult] = useState(null);
   const [contentTypes, setContentTypes] = useState([]);
   const [testLoading, setTestLoading] = useState(false);
-  const [feedbackData, setFeedbackData] = useState({
-    overview: {
-      total_summaries: 0,
-      positive_feedback: 0,
-      negative_feedback: 0,
-      average_rating: 0,
-    },
-    details: [],
-  });
-  const [feedbackLoading, setFeedbackLoading] = useState(false);
-  
+
+
   useEffect(() => {
     fetchTemplates();
     
-    // Mock content types for demo
+    // 模拟内容类型数据用于演示
     setContentTypes([
-      { id: 1, name: 'News Articles' },
-      { id: 2, name: 'Blog Posts' },
-      { id: 3, name: 'Technical Documentation' },
-      { id: 4, name: 'Product Reviews' },
-      { id: 5, name: 'Scientific Papers' },
+      { id: 1, name: '新闻文章' },
+      { id: 2, name: '博客文章' },
+      { id: 3, name: '技术文档' },
+      { id: 4, name: '产品评论' },
+      { id: 5, name: '科学论文' },
     ]);
   }, []);
   
@@ -89,11 +78,11 @@ const SummaryTemplates = () => {
       if (response.code === 200) {
         setTemplates(response.data);
       } else {
-        message.error('Failed to fetch summary templates');
+        message.error('获取摘要模板失败');
       }
     } catch (error) {
-      console.error('Error fetching templates:', error);
-      message.error('An error occurred while loading templates');
+      console.error('获取模板时出错:', error);
+      message.error('加载模板时发生错误');
     } finally {
       setLoading(false);
     }
@@ -152,15 +141,15 @@ const SummaryTemplates = () => {
       }
       
       if (response.code === 200) {
-        message.success(`Template ${editingTemplate ? 'updated' : 'created'} successfully`);
+        message.success(`模板${editingTemplate ? '更新' : '创建'}成功`);
         closeDrawer();
         fetchTemplates();
       } else {
-        message.error(response.message || `Failed to ${editingTemplate ? 'update' : 'create'} template`);
+        message.error(response.message || `模板${editingTemplate ? '更新' : '创建'}失败`);
       }
     } catch (error) {
-      console.error(`Error ${editingTemplate ? 'updating' : 'creating'} template:`, error);
-      message.error(`An error occurred while ${editingTemplate ? 'updating' : 'creating'} the template`);
+      console.error(`模板${editingTemplate ? '更新' : '创建'}时出错:`, error);
+      message.error(`模板${editingTemplate ? '更新' : '创建'}时发生错误`);
     }
   };
   
@@ -168,14 +157,14 @@ const SummaryTemplates = () => {
     try {
       const response = await deleteSummaryTemplate(id);
       if (response.code === 200) {
-        message.success('Template deleted successfully');
+        message.success('模板删除成功');
         fetchTemplates();
       } else {
-        message.error(response.message || 'Failed to delete template');
+        message.error(response.message || '删除模板失败');
       }
     } catch (error) {
-      console.error('Error deleting template:', error);
-      message.error('An error occurred while deleting the template');
+      console.error('删除模板时出错:', error);
+      message.error('删除模板时发生错误');
     }
   };
   
@@ -193,104 +182,89 @@ const SummaryTemplates = () => {
       const response = await testSummaryTemplate(previewTemplate.id);
       if (response.code === 200) {
         setTestResult(response.data);
-        message.success('Test summary generated successfully');
+        message.success('测试摘要生成成功');
       } else {
-        message.error(response.message || 'Failed to generate test summary');
+        message.error(response.message || '生成测试摘要失败');
       }
     } catch (error) {
-      console.error('Error testing template:', error);
-      message.error('An error occurred while testing the template');
+      console.error('测试模板时出错:', error);
+      message.error('测试模板时发生错误');
     } finally {
       setTestLoading(false);
     }
   };
   
-  const loadFeedbackData = async (templateId) => {
-    setFeedbackLoading(true);
-    try {
-      const response = await fetchUserFeedback(templateId);
-      if (response.code === 200) {
-        setFeedbackData(response.data);
-      } else {
-        message.error('Failed to load feedback data');
-      }
-    } catch (error) {
-      console.error('Error loading feedback:', error);
-      message.error('An error occurred while loading feedback data');
-    } finally {
-      setFeedbackLoading(false);
-    }
-  };
+
   
   const columns = [
     {
-      title: 'Name',
+      title: '名称',
       dataIndex: 'name',
       key: 'name',
       render: (text, record) => (
         <Space>
           {text}
           {record.is_default === 1 && (
-            <Tag color="gold">Default</Tag>
+            <Tag color="gold">默认</Tag>
           )}
         </Space>
       ),
     },
     {
-      title: 'Content Type',
+      title: '内容类型',
       dataIndex: 'content_type_name',
       key: 'content_type_name',
       render: (text) => <Tag color="blue">{text}</Tag>,
     },
     {
-      title: 'Description',
+      title: '描述',
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
     },
     {
-      title: 'Last Modified',
+      title: '最后修改时间',
       dataIndex: 'updated_at',
       key: 'updated_at',
     },
     {
-      title: 'Status',
+      title: '状态',
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
         <Badge 
           status={status === 1 ? 'success' : 'default'} 
-          text={status === 1 ? 'Active' : 'Inactive'} 
+          text={status === 1 ? '启用' : '停用'} 
         />
       ),
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       render: (_, record) => (
         <Space>
-          <Tooltip title="Preview">
+          <Tooltip title="预览">
             <Button
               icon={<EyeOutlined />}
               size="small"
               onClick={() => showPreview(record)}
             />
           </Tooltip>
-          <Tooltip title="Edit">
+          <Tooltip title="编辑">
             <Button
               icon={<EditOutlined />}
               size="small"
               onClick={() => showDrawer(record)}
             />
           </Tooltip>
-          <Tooltip title="Copy">
+          <Tooltip title="复制">
             <Button
               icon={<CopyOutlined />}
               size="small"
               onClick={() => {
                 const newTemplate = {
                   ...record,
-                  name: `${record.name} (Copy)`,
+                  name: `${record.name} (复制)`,
                   is_default: 0,
                 };
                 delete newTemplate.id;
@@ -299,12 +273,12 @@ const SummaryTemplates = () => {
             />
           </Tooltip>
           <Popconfirm
-            title="Are you sure you want to delete this template?"
+            title="确定要删除此模板吗？"
             onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
+            okText="是"
+            cancelText="否"
           >
-            <Tooltip title="Delete">
+            <Tooltip title="删除">
               <Button
                 icon={<DeleteOutlined />}
                 size="small"
@@ -320,14 +294,14 @@ const SummaryTemplates = () => {
   return (
     <div>
       <Card 
-        title="Summary Templates" 
+        title="摘要模板" 
         extra={
           <Button 
             type="primary" 
             icon={<PlusOutlined />} 
             onClick={() => showDrawer()}
           >
-            Add Template
+            添加模板
           </Button>
         }
       >
@@ -340,7 +314,7 @@ const SummaryTemplates = () => {
       </Card>
       
       <Drawer
-        title={editingTemplate ? "Edit Summary Template" : "Create Summary Template"}
+        title={editingTemplate ? "编辑摘要模板" : "创建摘要模板"}
         width={720}
         onClose={closeDrawer}
         open={drawerVisible}
@@ -348,10 +322,10 @@ const SummaryTemplates = () => {
         footer={
           <div style={{ textAlign: 'right' }}>
             <Button style={{ marginRight: 8 }} onClick={closeDrawer}>
-              Cancel
+              取消
             </Button>
             <Button type="primary" onClick={() => form.submit()}>
-              {editingTemplate ? 'Update' : 'Create'}
+              {editingTemplate ? '更新' : '创建'}
             </Button>
           </div>
         }
@@ -363,25 +337,25 @@ const SummaryTemplates = () => {
         >
           <Form.Item
             name="name"
-            label="Template Name"
-            rules={[{ required: true, message: 'Please enter template name' }]}
+            label="模板名称"
+            rules={[{ required: true, message: '请输入模板名称' }]}
           >
-            <Input placeholder="Enter template name" />
+            <Input placeholder="请输入模板名称" />
           </Form.Item>
           
           <Form.Item
             name="description"
-            label="Description"
+            label="描述"
           >
-            <TextArea rows={2} placeholder="Enter template description" />
+            <TextArea rows={2} placeholder="请输入模板描述" />
           </Form.Item>
           
           <Form.Item
             name="content_type_id"
-            label="Content Type"
-            rules={[{ required: true, message: 'Please select content type' }]}
+            label="内容类型"
+            rules={[{ required: true, message: '请选择内容类型' }]}
           >
-            <Select placeholder="Select content type">
+            <Select placeholder="请选择内容类型">
               {contentTypes.map(type => (
                 <Option key={type.id} value={type.id}>{type.name}</Option>
               ))}
@@ -392,35 +366,35 @@ const SummaryTemplates = () => {
             name="template_content"
             label={
               <Space>
-                <span>Template Content</span>
-                <Tooltip title="Use placeholders like {{title}}, {{summary}}, {{source}}, etc.">
+                <span>模板内容</span>
+                <Tooltip title="使用占位符如 {{title}}, {{summary}}, {{source}} 等">
                   <InfoCircleOutlined />
                 </Tooltip>
               </Space>
             }
-            rules={[{ required: true, message: 'Please enter template content' }]}
+            rules={[{ required: true, message: '请输入模板内容' }]}
           >
             <TextArea
               rows={8}
-              placeholder="Enter HTML template content with placeholders"
+              placeholder="请输入包含占位符的 HTML 模板内容"
             />
           </Form.Item>
           
           <Form.Item
             name="css_styles"
-            label="CSS Styles"
+            label="CSS 样式"
           >
             <TextArea
               rows={4}
-              placeholder="Enter custom CSS styles"
+              placeholder="请输入自定义 CSS 样式"
             />
           </Form.Item>
           
-          <Divider>Display Options</Divider>
+          <Divider>显示选项</Divider>
           
           <Form.Item
             name="show_original_link"
-            label="Show Original Link"
+            label="显示原文链接"
             valuePropName="checked"
           >
             <Switch />
@@ -428,7 +402,7 @@ const SummaryTemplates = () => {
           
           <Form.Item
             name="show_created_time"
-            label="Show Created Time"
+            label="显示创建时间"
             valuePropName="checked"
           >
             <Switch />
@@ -436,35 +410,35 @@ const SummaryTemplates = () => {
           
           <Form.Item
             name="show_content_type"
-            label="Show Content Type"
+            label="显示内容类型"
             valuePropName="checked"
           >
             <Switch />
           </Form.Item>
           
-          <Divider>Settings</Divider>
+          <Divider>设置</Divider>
           
           <Form.Item
             name="is_default"
-            label="Default Template"
+            label="默认模板"
             valuePropName="checked"
-            tooltip="Set as default template for this content type"
+            tooltip="设置为此内容类型的默认模板"
           >
             <Switch />
           </Form.Item>
           
           <Form.Item
             name="status"
-            label="Status"
+            label="状态"
             valuePropName="checked"
           >
-            <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
+            <Switch checkedChildren="启用" unCheckedChildren="停用" />
           </Form.Item>
         </Form>
       </Drawer>
       
       <Drawer
-        title={previewTemplate ? `Template Preview: ${previewTemplate.name}` : 'Template Preview'}
+        title={previewTemplate ? `模板预览: ${previewTemplate.name}` : '模板预览'}
         width={800}
         onClose={() => setPreviewVisible(false)}
         open={previewVisible}
@@ -475,7 +449,7 @@ const SummaryTemplates = () => {
               onClick={handleTestTemplate}
               loading={testLoading}
             >
-              Test with Sample Content
+              使用示例内容测试
             </Button>
           </Space>
         }
@@ -485,21 +459,21 @@ const SummaryTemplates = () => {
               tab={
                 <span>
                   <FormOutlined />
-                  Template Details
+                  模板详情
                 </span>
               }
               key="1"
             >
               <div>
-                <Title level={5}>Content Type</Title>
+                <Title level={5}>内容类型</Title>
                 <Paragraph>{previewTemplate.content_type_name}</Paragraph>
                 
-                <Title level={5}>Description</Title>
-                <Paragraph>{previewTemplate.description || 'No description provided'}</Paragraph>
+                <Title level={5}>描述</Title>
+                <Paragraph>{previewTemplate.description || '未提供描述'}</Paragraph>
                 
                 <Divider />
                 
-                <Title level={5}>Template Content</Title>
+                <Title level={5}>模板内容</Title>
                 <div style={{ 
                   background: '#f5f5f5', 
                   padding: 16, 
@@ -512,7 +486,7 @@ const SummaryTemplates = () => {
                 
                 {previewTemplate.css_styles && (
                   <>
-                    <Title level={5} style={{ marginTop: 16 }}>CSS Styles</Title>
+                    <Title level={5} style={{ marginTop: 16 }}>CSS 样式</Title>
                     <div style={{ 
                       background: '#f5f5f5', 
                       padding: 16, 
@@ -527,23 +501,23 @@ const SummaryTemplates = () => {
                 
                 <Divider />
                 
-                <Title level={5}>Options</Title>
+                <Title level={5}>选项</Title>
                 <List size="small">
                   <List.Item>
-                    <span>Show Original Link:</span>
-                    <span>{previewTemplate.show_original_link === 1 ? 'Yes' : 'No'}</span>
+                    <span>显示原文链接:</span>
+                    <span>{previewTemplate.show_original_link === 1 ? '是' : '否'}</span>
                   </List.Item>
                   <List.Item>
-                    <span>Show Created Time:</span>
-                    <span>{previewTemplate.show_created_time === 1 ? 'Yes' : 'No'}</span>
+                    <span>显示创建时间:</span>
+                    <span>{previewTemplate.show_created_time === 1 ? '是' : '否'}</span>
                   </List.Item>
                   <List.Item>
-                    <span>Show Content Type:</span>
-                    <span>{previewTemplate.show_content_type === 1 ? 'Yes' : 'No'}</span>
+                    <span>显示内容类型:</span>
+                    <span>{previewTemplate.show_content_type === 1 ? '是' : '否'}</span>
                   </List.Item>
                   <List.Item>
-                    <span>Default Template:</span>
-                    <span>{previewTemplate.is_default === 1 ? 'Yes' : 'No'}</span>
+                    <span>默认模板:</span>
+                    <span>{previewTemplate.is_default === 1 ? '是' : '否'}</span>
                   </List.Item>
                 </List>
               </div>
@@ -553,7 +527,7 @@ const SummaryTemplates = () => {
               tab={
                 <span>
                   <EyeOutlined />
-                  Preview
+                  预览
                 </span>
               }
               key="2"
@@ -573,90 +547,13 @@ const SummaryTemplates = () => {
                 <div style={{ textAlign: 'center', padding: '40px 0' }}>
                   <FileTextOutlined style={{ fontSize: 48, color: '#d9d9d9' }} />
                   <p style={{ marginTop: 16 }}>
-                    Click "Test with Sample Content" to preview the template with sample data
+                    点击“使用示例内容测试”以使用示例数据预览模板
                   </p>
                 </div>
               )}
             </TabPane>
             
-            <TabPane
-              tab={
-                <span>
-                  <InfoCircleOutlined />
-                  User Feedback
-                </span>
-              }
-              key="3"
-              onTabClick={() => loadFeedbackData(previewTemplate.id)}
-            >
-              {feedbackLoading ? (
-                <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                  <span>Loading feedback data...</span>
-                </div>
-              ) : (
-                <div>
-                  <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-around', 
-                    marginBottom: 24,
-                    textAlign: 'center' 
-                  }}>
-                    <div>
-                      <Statistic 
-                        title="Total Summaries" 
-                        value={feedbackData.overview.total_summaries} 
-                      />
-                    </div>
-                    <div>
-                      <Statistic 
-                        title="Positive Feedback" 
-                        value={feedbackData.overview.positive_feedback} 
-                        suffix={`(${Math.round(feedbackData.overview.positive_feedback / feedbackData.overview.total_summaries * 100) || 0}%)`}
-                        valueStyle={{ color: '#3f8600' }}
-                      />
-                    </div>
-                    <div>
-                      <Statistic 
-                        title="Negative Feedback" 
-                        value={feedbackData.overview.negative_feedback} 
-                        suffix={`(${Math.round(feedbackData.overview.negative_feedback / feedbackData.overview.total_summaries * 100) || 0}%)`}
-                        valueStyle={{ color: '#cf1322' }}
-                      />
-                    </div>
-                    <div>
-                      <Statistic 
-                        title="Average Rating" 
-                        value={feedbackData.overview.average_rating} 
-                        precision={1}
-                        suffix="/5"
-                      />
-                    </div>
-                  </div>
-                  
-                  <Divider>Recent Feedback</Divider>
-                  
-                  <List
-                    itemLayout="horizontal"
-                    dataSource={feedbackData.details}
-                    renderItem={item => (
-                      <List.Item>
-                        <List.Item.Meta
-                          title={
-                            <Space>
-                              <span>User {item.user_id}</span>
-                              <Rate disabled defaultValue={item.rating} />
-                              <Text type="secondary">{item.created_at}</Text>
-                            </Space>
-                          }
-                          description={item.comment || 'No comment provided'}
-                        />
-                      </List.Item>
-                    )}
-                    locale={{ emptyText: 'No feedback received yet' }}
-                  />
-                </div>
-              )}
-            </TabPane>
+       
           </Tabs>
         )}
       </Drawer>

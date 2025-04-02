@@ -263,7 +263,7 @@ const ContentAdjustment = () => {
     setPreviewVisible(true);
   };
 
-  const fetchAdjustmentHistory = async (id) => {
+  const fetchAdjustmentHistory = async () => {
     // In a real application, this would fetch from the server
     setAdjustmentHistory([
       { 

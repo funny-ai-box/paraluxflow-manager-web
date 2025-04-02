@@ -4,7 +4,7 @@ import { ProTable } from '@ant-design/pro-components';
 import { Button, Tag, message, Tooltip, Space } from 'antd';
 import { EyeOutlined, EditOutlined, PlusOutlined, CodeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { fetchTemplates, updateTemplateStatus } from '@/services/template';
+import { fetchTemplates } from '@/services/template';
 
 const TemplateList = () => {
   const [templates, setTemplates] = useState([]);
@@ -20,7 +20,12 @@ const TemplateList = () => {
     try {
       const response = await fetchTemplates(params);
       if (response.code === 200) {
-        setTemplates(response.data);
+        console.log('=============================response')
+        console.log(response);
+        console.log('=============================')
+        
+        setTemplates(response.data.list);
+        
       } else {
         message.error(response.message || 'Failed to load templates');
       }
@@ -32,24 +37,7 @@ const TemplateList = () => {
     }
   };
 
-  const handleStatusChange = async (id, status) => {
-    try {
-      const response = await updateTemplateStatus({
-        template_id: id,
-        status: status ? 1 : 0
-      });
-      
-      if (response.code === 200) {
-        message.success('Template status updated successfully');
-        loadTemplates();
-      } else {
-        message.error(response.message || 'Failed to update template status');
-      }
-    } catch (error) {
-      console.error('Error updating template status:', error);
-      message.error('An error occurred while updating template status');
-    }
-  };
+
 
   const columns = [
     {

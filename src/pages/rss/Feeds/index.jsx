@@ -14,7 +14,7 @@ const Feeds = () => {
     const loadFeeds = async () => {
       setLoading(true);
       const response = await fetchRssFeeds({});
-      setFeeds(response.data); // Assuming 'data' contains your feeds
+      setFeeds(response.data); // 假设 'data' 包含了你的 feeds
       setLoading(false);
 
     };
@@ -28,8 +28,8 @@ const Feeds = () => {
         action: checked ? 'enable' : 'disable',
       });
       if (response.code === 200) {
-        message.success('Status updated successfully');
-        // Update the feed state locally
+        message.success('状态更新成功');
+        // 本地更新 feed 状态
         const updatedFeeds = feeds.map((feed) => {
           if (feed.id === record.id) {
             return { ...feed, is_active: checked };
@@ -42,7 +42,7 @@ const Feeds = () => {
       }
     } catch (error) {
       console.error(error);
-      message.error('Failed to update status');
+      message.error('状态更新失败');
     } finally {
       setLoading(false);
     }
@@ -67,18 +67,18 @@ const Feeds = () => {
 
     },
     {
-      title: 'Title',
+      title: '标题',
       dataIndex: 'title',
       width: 180,
     },
     {
-      title: 'Description',
+      title: '描述',
       dataIndex: 'description',
       width: 180,
     },
 
     {
-      title: 'Link',
+      title: '链接',
       dataIndex: 'url',
       width: 200,
       render: (_, record) =>
@@ -91,7 +91,7 @@ const Feeds = () => {
         ),
     },
     {
-      title: 'Category',
+      title: '分类',
       dataIndex: 'category',
       search: false,
       width: 100,
@@ -104,7 +104,7 @@ const Feeds = () => {
       },
     },
     {
-      title: 'Collection',
+      title: '集合',
       dataIndex: 'collection',
       search: false,
       width: 100,
@@ -117,14 +117,14 @@ const Feeds = () => {
       },
     },
     {
-      title: 'Create Time',
+      title: '创建时间',
       dataIndex: 'created_at',
       valueType: 'dateTime',
       width: 100,
       search: false,
     },
     {
-      title: 'Enable',
+      title: '启用',
       dataIndex: 'is_active',
       fixed: 'right',
       align: 'center',
@@ -147,18 +147,18 @@ const Feeds = () => {
       },
     },
     {
-      title: 'Options',
+      title: '操作',
       valueType: 'option',
       fixed: 'right',
       width: 100,
       render: (_, record) => (
         <a
-          key="View"
+          key="查看"
           target="_blank"
           href={`/rss-manager/feeds/detail/${record.id}`}
           rel="noreferrer"
         >
-          View Detail
+          查看详情
         </a>
       ),
     },
@@ -186,7 +186,7 @@ const Feeds = () => {
       }}
       // search={false}
       dateFormatter="string"
-      headerTitle="RSS Feeds"
+      headerTitle="RSS 订阅源"
       toolBarRender={() => [<CreateNewFeed key="create" />]}
     />
   );

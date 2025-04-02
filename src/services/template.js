@@ -9,14 +9,15 @@ export async function fetchTemplates(params = {}) {
     
     // Fetch template details
     export async function fetchTemplateDetail(id) {
-      return request(`/api/v1/templates/${id}`, {
-        method: 'GET'
+      return request(`/api/v1/templates`, {
+        method: 'GET',
+        params: { id }
       });
     }
     
     // Create new template
     export async function createTemplate(data) {
-      return request('/api/v1/templates', {
+      return request('/api/v1/templates/create', {
         method: 'POST',
         data
       });
@@ -24,32 +25,33 @@ export async function fetchTemplates(params = {}) {
     
     // Update existing template
     export async function updateTemplate(id, data) {
-      return request(`/api/v1/templates/${id}`, {
-        method: 'PUT',
-        data
+      return request(`/api/v1/templates`, {
+        method: 'POST',
+        data: { id, ...data }
       });
     }
     
     // Update template status
     export async function updateTemplateStatus(data) {
       return request('/api/v1/templates/status', {
-        method: 'PUT',
+        method: 'POST',
         data
       });
     }
     
     // Fetch template script
     export async function fetchTemplateScript(id) {
-      return request(`/api/v1/templates/${id}/script`, {
-        method: 'GET'
+      return request(`/api/v1/templates/script`, {
+        method: 'GET',
+        params: { id }
       });
     }
     
     // Update template script
     export async function updateTemplateScript(id, data) {
-      return request(`/api/v1/templates/${id}/script`, {
-        method: 'PUT',
-        data
+      return request(`/api/v1/templates/script`, {
+        method: 'POST',
+        data: { id, ...data }
       });
     }
     
@@ -66,8 +68,9 @@ export async function fetchTemplates(params = {}) {
     
     // Fetch template usage data
     export async function fetchTemplateUsage(id) {
-      return request(`/api/v1/templates/${id}/usage`, {
-        method: 'GET'
+      return request(`/api/v1/templates/usage`, {
+        method: 'GET',
+        params: { id }
       });
     }
 

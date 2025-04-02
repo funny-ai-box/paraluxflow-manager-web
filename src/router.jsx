@@ -30,14 +30,11 @@ import ContentAdjustment from './pages/recommendation/ContentAdjustment';
 // AI Pages
 import ModelConfig from './pages/ai/ModelConfig';
 import SummaryTemplates from './pages/ai/SummaryTemplates';
-import FeedbackAnalysis from './pages/ai/FeedbackAnalysis';
+
 
 // Task Pages
 import ScheduledTasks from './pages/tasks/ScheduledTasks';
 import MonitoringDashboard from './pages/tasks/MonitoringDashboard';
-
-// Statistics Pages
-import DataAnalysis from './pages/statistics/DataAnalysis';
 
 // System Pages
 import LogsAndAlerts from './pages/system/LogsAndAlerts';
@@ -117,11 +114,7 @@ const router = createBrowserRouter([
         path: '/ai/templates',
         element: <SummaryTemplates />,
       },
-      {
-        path: '/ai/feedback',
-        element: <FeedbackAnalysis />,
-      },
-      
+
       // Tasks
       {
         path: '/tasks/scheduled',
@@ -131,13 +124,7 @@ const router = createBrowserRouter([
         path: '/tasks/monitoring',
         element: <MonitoringDashboard />,
       },
-      
-      // Statistics
-      {
-        path: '/statistics/data-analysis',
-        element: <DataAnalysis />,
-      },
-      
+
       // System
       {
         path: '/system/logs-alerts',
