@@ -7,22 +7,9 @@ import {
   UserOutlined,
   HomeOutlined,
   ReadOutlined,
-  FileTextOutlined,
   FileSearchOutlined,
-  AppstoreOutlined,
-  RobotOutlined,
-  ScheduleOutlined,
-  BarChartOutlined,
   SettingOutlined,
-  BulbOutlined,
-  ToolOutlined,
-  LineChartOutlined,
-  DashboardOutlined,
   AlertOutlined,
-  ClusterOutlined,
-  ApiOutlined,
-  FileAddOutlined,
-  EditOutlined
 } from '@ant-design/icons';
 import { Layout, Menu, Button, theme, Avatar, Breadcrumb } from 'antd';
 
@@ -50,21 +37,7 @@ const menuItems = [
       },
     ],
   },
-  {
-    key: 'templates',
-    icon: <FileAddOutlined />,
-    label: '资源模板',
-    children: [
-      {
-        key: '/templates',
-        label: '模板列表',
-      },
-      {
-        key: '/templates/create',
-        label: '创建模板',
-      },
-    ],
-  },
+  
   {
     key: 'crawler',
     icon: <FileSearchOutlined />,
@@ -79,75 +52,8 @@ const menuItems = [
         label: '内容抓取',
       },
     ],
-  },
-  {
-    key: 'recommendation',
-    icon: <BulbOutlined />,
-    label: '推荐',
-    children: [
-      {
-        key: '/recommendation/rules',
-        label: '规则管理',
-      },
-      {
-        key: '/recommendation/content',
-        label: '内容调整',
-      },
-    ],
-  },
-  {
-    key: 'ai',
-    icon: <RobotOutlined />,
-    label: 'AI 摘要',
-    children: [
-      {
-        key: '/ai/models',
-        label: '模型配置',
-      },
-      {
-        key: '/ai/templates',
-        label: '摘要模板',
-      },
-  
-    ],
-  },
-  {
-    key: 'tasks',
-    icon: <ScheduleOutlined />,
-    label: '任务',
-    children: [
-      {
-        key: '/tasks/scheduled',
-        label: '定时任务',
-      },
-      {
-        key: '/tasks/monitoring',
-        label: '监控面板',
-      },
-    ],
-  },
-  {
-    key: 'statistics',
-    icon: <BarChartOutlined />,
-    label: '统计',
-    children: [
-      {
-        key: '/statistics/data-analysis',
-        label: '数据分析',
-      },
-    ],
-  },
-  {
-    key: 'system',
-    icon: <SettingOutlined />,
-    label: '系统',
-    children: [
-      {
-        key: '/system/logs-alerts',
-        label: '日志与警报',
-      },
-    ],
-  },
+  }
+ 
 ];
 
 // Generate breadcrumb items
