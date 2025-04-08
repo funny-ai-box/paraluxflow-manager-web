@@ -34,11 +34,11 @@ const LlmProvidersPage = () => {
       if (response.code === 200) {
         setProviders(response.data || []);
       } else {
-        message.error(response.message || 'Failed to fetch LLM providers');
+        message.error(response.message || '获取 LLM 提供商失败');
       }
     } catch (error) {
       console.error('Error fetching LLM providers:', error);
-      message.error('An error occurred while fetching LLM providers');
+      message.error('获取 LLM 提供商时发生错误');
     } finally {
       setLoading(false);
     }
@@ -61,7 +61,7 @@ const LlmProvidersPage = () => {
       width: 80,
     },
     {
-      title: 'Provider',
+      title: '提供商',
       dataIndex: 'name',
       key: 'name',
       render: (text, record) => (
@@ -78,7 +78,7 @@ const LlmProvidersPage = () => {
       ),
     },
     {
-      title: 'Description',
+      title: '描述',
       dataIndex: 'description',
       key: 'description',
       ellipsis: {
@@ -91,21 +91,21 @@ const LlmProvidersPage = () => {
       ),
     },
     {
-      title: 'Status',
+      title: '状态',
       dataIndex: 'status',
       key: 'status',
       render: (status) => {
         let color = 'default';
-        let text = 'Unknown';
+        let text = '未知';
         let icon = null;
         
         if (status === 1) {
           color = 'success';
-          text = 'Active';
+          text = '活跃';
           icon = <CheckCircleOutlined />;
         } else if (status === 0) {
           color = 'warning';
-          text = 'Inactive';
+          text = '未激活';
           icon = <ExclamationCircleOutlined />;
         }
         
@@ -117,23 +117,23 @@ const LlmProvidersPage = () => {
       },
     },
     {
-      title: 'API Configured',
+      title: 'API 配置状态',
       dataIndex: 'is_configured',
       key: 'is_configured',
       render: (configured) => (
         <Tag color={configured ? 'green' : 'orange'}>
-          {configured ? 'Configured' : 'Not Configured'}
+          {configured ? '已配置' : '未配置'}
         </Tag>
       ),
     },
     {
-      title: 'Default Model',
+      title: '默认模型',
       dataIndex: 'default_model',
       key: 'default_model',
       render: (model) => model || '-',
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       render: (_, record) => (
         <Space>
@@ -142,13 +142,13 @@ const LlmProvidersPage = () => {
             icon={<SettingOutlined />} 
             onClick={() => handleViewDetail(record)}
           >
-            Configure
+            配置
           </Button>
           <Button 
             icon={<ApiOutlined />}
             onClick={() => handleViewDetail(record)}
           >
-            Test API
+            测试 API
           </Button>
         </Space>
       ),
@@ -157,8 +157,8 @@ const LlmProvidersPage = () => {
 
   return (
     <PageContainer
-      title="LLM Providers"
-      subTitle="Manage and configure large language model providers"
+      title="LLM 提供商"
+      subTitle="管理和配置大型语言模型提供商"
     >
       <Card>
         <Table 

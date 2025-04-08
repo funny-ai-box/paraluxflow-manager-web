@@ -53,7 +53,7 @@ export default function FeedDetail() {
     if (result.code === 200) {
       setFeedDetail(result.data);
     } else {
-      message.error(result.message || 'Failed to fetch feed details');
+      message.error(result.message || '获取订阅源详情失败');
     }
   };
 
@@ -73,11 +73,11 @@ export default function FeedDetail() {
           total: result.data.total || 0,
         });
       } else {
-        message.error(result.message || 'Failed to fetch feed articles');
+        message.error(result.message || '获取订阅源文章失败');
       }
     } catch (error) {
-      console.error('Error fetching feed articles:', error);
-      message.error('An error occurred while fetching feed articles');
+      console.error('获取订阅源文章时出错:', error);
+      message.error('获取订阅源文章时发生错误');
     } finally {
       setLoading(false);
     }
@@ -104,17 +104,17 @@ export default function FeedDetail() {
     try {
       const result = await syncFeedArticles(id);
       if (result.code === 200) {
-        message.success('Feed articles synced successfully');
+        message.success('订阅源文章同步成功');
         fetchFeedArticles({
           page: 1,
           pageSize: tableParams.pageSize,
         });
       } else {
-        message.error(result.message || 'Failed to sync feed articles');
+        message.error(result.message || '同步订阅源文章失败');
       }
     } catch (error) {
-      console.error('Error syncing feed articles:', error);
-      message.error('An error occurred while syncing feed articles');
+      console.error('同步订阅源文章时出错:', error);
+      message.error('同步订阅源文章时发生错误');
     } finally {
       setLoading(false);
     }
@@ -128,13 +128,13 @@ export default function FeedDetail() {
       });
       if (result.code === 200) {
         setProcessedResults(result.data);
-        message.success('Content processed successfully');
+        message.success('内容处理成功');
       } else {
-        message.error(result.message || 'Failed to process content');
+        message.error(result.message || '处理内容失败');
       }
     } catch (error) {
-      console.error('Error processing content:', error);
-      message.error('An error occurred while processing the content');
+      console.error('处理内容时出错:', error);
+      message.error('处理内容时发生错误');
     }
   };
 
@@ -147,11 +147,11 @@ export default function FeedDetail() {
       if (result.code === 200) {
         setHtmlContent(result.data);
       } else {
-        message.error(result.message || 'Failed to fetch HTML content');
+        message.error(result.message || '获取HTML内容失败');
       }
     } catch (error) {
-      console.error('Error fetching HTML content:', error);
-      message.error('An error occurred while fetching HTML content');
+      console.error('获取HTML内容时出错:', error);
+      message.error('获取HTML内容时发生错误');
       setHtmlLoading(false);
     }
   };
@@ -175,7 +175,7 @@ export default function FeedDetail() {
       width: 80,
     },
     {
-      title: 'Thumbnail',
+      title: '缩略图',
       dataIndex: 'thumbnail_url',
       key: 'thumbnail_url',
       width: 120,
@@ -196,14 +196,14 @@ export default function FeedDetail() {
       ),
     },
     { 
-      title: 'Title', 
+      title: '标题', 
       dataIndex: 'title', 
       key: 'title',
       width: 250,
       ellipsis: true,
     },
     {
-      title: 'Link',
+      title: '链接',
       dataIndex: 'link',
       key: 'link',
       width: 180,
@@ -217,21 +217,21 @@ export default function FeedDetail() {
       ),
     },
     { 
-      title: 'Summary', 
+      title: '摘要', 
       dataIndex: 'summary', 
       key: 'summary',
       width: 300,
       ellipsis: true,
     },
     {
-      title: 'Published',
+      title: '发布时间',
       dataIndex: 'published_date',
       key: 'published_date',
       width: 180,
       render: (text) => text ? dayjs(text).format('YYYY-MM-DD HH:mm:ss') : 'N/A',
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       width: 120,
       render: (_, record) => (
@@ -251,7 +251,7 @@ export default function FeedDetail() {
     <>
       <Card 
         title={
-          <Title level={4}>{feedDetail.title || 'Feed Details'}</Title>
+          <Title level={4}>{feedDetail.title || '订阅源详情'}</Title>
         } 
         bordered={false} 
         style={{ marginBottom: 20 }}
@@ -263,9 +263,9 @@ export default function FeedDetail() {
             valueType="text"
             contentStyle={{ maxWidth: '100%' }}
             ellipsis
-            label="Description"
+            label="描述"
           >
-            {feedDetail.description || 'No description available'}
+            {feedDetail.description || '暂无描述'}
           </ProDescriptions.Item>
           
           <ProDescriptions.Item label="Logo" valueType="image">
@@ -276,34 +276,34 @@ export default function FeedDetail() {
             {feedDetail.url || '-'}
           </ProDescriptions.Item>
           
-          <ProDescriptions.Item label="Active Status">
+          <ProDescriptions.Item label="激活状态">
             {feedDetail.is_active ? (
-              <Tag color="green">Active</Tag>
+              <Tag color="green">已激活</Tag>
             ) : (
-              <Tag color="red">Inactive</Tag>
+              <Tag color="red">未激活</Tag>
             )}
           </ProDescriptions.Item>
 
-          <ProDescriptions.Item label="Category">
+          <ProDescriptions.Item label="分类">
             {feedDetail.category_id ? `${feedDetail.category_id}` : '-'}
           </ProDescriptions.Item>
           
-          <ProDescriptions.Item label="Created At" valueType="dateTime">
+          <ProDescriptions.Item label="创建时间" valueType="dateTime">
             {feedDetail.created_at ? dayjs(feedDetail.created_at).format('YYYY-MM-DD HH:mm:ss') : '-'}
           </ProDescriptions.Item>
           
-          <ProDescriptions.Item label="Updated At" valueType="dateTime">
+          <ProDescriptions.Item label="更新时间" valueType="dateTime">
             {feedDetail.updated_at ? dayjs(feedDetail.updated_at).format('YYYY-MM-DD HH:mm:ss') : '-'}
           </ProDescriptions.Item>
           
-          <ProDescriptions.Item label="Crawler Script">
+          <ProDescriptions.Item label="爬虫脚本">
             {feedDetail.group_id ? (
               <Button type="primary" onClick={() => setShowGroupEditor(true)}>
-                Open Group Editor
+                打开分组编辑器
               </Button>
             ) : (
               <Button type="primary" onClick={() => setShowEditor(true)}>
-                Open Feed Editor
+                打开订阅源编辑器
               </Button>
             )}
           </ProDescriptions.Item>
@@ -311,7 +311,7 @@ export default function FeedDetail() {
       </Card>
       
       <Card 
-        title="Articles" 
+        title="文章列表" 
         bordered={false} 
         extra={
           <div>
@@ -326,7 +326,7 @@ export default function FeedDetail() {
             </Button>
             {testData.length > 0 && (
               <Button onClick={() => setShowDrawer(true)}>
-                View JSON Data
+                查看JSON数据
               </Button>
             )}
           </div>
@@ -342,7 +342,7 @@ export default function FeedDetail() {
             total: tableParams.total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `Total ${total} items`,
+            showTotal: (total) => `共 ${total} 条数据`,
           }} 
           loading={loading}
           onChange={handleTableChange}
@@ -351,7 +351,7 @@ export default function FeedDetail() {
       </Card>
 
       <Drawer
-        title="Article Data (JSON)"
+        title="文章数据 (JSON)"
         placement="right"
         closable={true}
         onClose={() => setShowDrawer(false)}
@@ -368,7 +368,7 @@ export default function FeedDetail() {
       </Drawer>
 
       <Drawer
-        title="HTML Content"
+        title="HTML内容"
         placement="right"
         closable={true}
         onClose={() => {
@@ -396,21 +396,21 @@ export default function FeedDetail() {
           </Col>
           <Col span={8} style={{ borderLeft: '1px solid #e8e8e8', height: 'calc(100vh - 150px)', overflow: 'auto' }}>
             <div style={{ padding: '0 16px' }}>
-              <Title level={5}>Processed Results</Title>
+              <Title level={5}>处理结果</Title>
               <div style={{ marginBottom: '16px' }}>
-                <Text strong>HTML Content:</Text>
+                <Text strong>HTML内容:</Text>
                 <div className="mt-2">
                   {processedResults.html_content ? (
                     <HtmlContentViewer htmlContent={processedResults.html_content} />
                   ) : (
-                    <Text type="secondary">No HTML content processed yet</Text>
+                    <Text type="secondary">尚未处理HTML内容</Text>
                   )}
                 </div>
               </div>
               <div>
-                <Text strong>Text Content:</Text>
+                <Text strong>文本内容:</Text>
                 <div style={{ marginTop: 8, padding: 16, border: '1px solid #f0f0f0', borderRadius: 4, background: '#fafafa', maxHeight: '50vh', overflow: 'auto' }}>
-                  {processedResults.text_content || <Text type="secondary">No text content processed yet</Text>}
+                  {processedResults.text_content || <Text type="secondary">尚未处理文本内容</Text>}
                 </div>
               </div>
             </div>

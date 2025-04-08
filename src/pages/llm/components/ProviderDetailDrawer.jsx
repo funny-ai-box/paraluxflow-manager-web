@@ -54,11 +54,11 @@ const ProviderDetailDrawer = ({ visible, provider, onClose, onSuccess }) => {
         setProviderDetail(response.data);
         form.setFieldsValue(response.data.config || {});
       } else {
-        message.error(response.message || 'Failed to fetch provider details');
+        message.error(response.message || '获取提供商详情失败');
       }
     } catch (error) {
       console.error('Error fetching provider details:', error);
-      message.error('An error occurred while fetching provider details');
+      message.error('获取提供商详情时发生错误');
     } finally {
       setLoading(false);
     }
@@ -70,11 +70,11 @@ const ProviderDetailDrawer = ({ visible, provider, onClose, onSuccess }) => {
       if (response.code === 200) {
         setModels(response.data || []);
       } else {
-        message.error(response.message || 'Failed to fetch provider models');
+        message.error(response.message || '获取提供商模型失败');
       }
     } catch (error) {
       console.error('Error fetching provider models:', error);
-      message.error('An error occurred while fetching provider models');
+      message.error('获取提供商模型时发生错误');
     }
   };
 
@@ -91,14 +91,14 @@ const ProviderDetailDrawer = ({ visible, provider, onClose, onSuccess }) => {
       const response = await updateLlmProviderConfig(configData);
       
       if (response.code === 200) {
-        message.success('Provider configuration updated successfully');
+        message.success('提供商配置更新成功');
         if (onSuccess) onSuccess();
       } else {
-        message.error(response.message || 'Failed to update provider configuration');
+        message.error(response.message || '更新提供商配置失败');
       }
     } catch (error) {
       console.error('Error updating provider configuration:', error);
-      message.error('An error occurred while updating provider configuration');
+      message.error('更新提供商配置时发生错误');
     } finally {
       setLoading(false);
     }
@@ -120,20 +120,20 @@ const ProviderDetailDrawer = ({ visible, provider, onClose, onSuccess }) => {
       if (response.code === 200) {
         setTestResult({
           success: true,
-          message: response.message || 'API test successful',
+          message: response.message || 'API 测试成功',
           data: response.data
         });
       } else {
         setTestResult({
           success: false,
-          message: response.message || 'API test failed'
+          message: response.message || 'API 测试失败'
         });
       }
     } catch (error) {
       console.error('Error testing provider API:', error);
       setTestResult({
         success: false,
-        message: 'An error occurred while testing the API'
+        message: '测试 API 时发生错误'
       });
     } finally {
       setTestLoading(false);
@@ -147,7 +147,7 @@ const ProviderDetailDrawer = ({ visible, provider, onClose, onSuccess }) => {
       <div style={{ marginTop: 16 }}>
         {testResult.success ? (
           <Alert
-            message="API Test Successful"
+            message="API 测试成功"
             description={
               <div>
                 <p>{testResult.message}</p>
@@ -164,7 +164,7 @@ const ProviderDetailDrawer = ({ visible, provider, onClose, onSuccess }) => {
           />
         ) : (
           <Alert
-            message="API Test Failed"
+            message="API 测试失败"
             description={testResult.message}
             type="error"
             showIcon
@@ -177,28 +177,28 @@ const ProviderDetailDrawer = ({ visible, provider, onClose, onSuccess }) => {
 
   return (
     <Drawer
-      title={`Configure ${provider?.name || 'Provider'}`}
+      title={`配置 ${provider?.name || '提供商'}`}
       width={720}
       onClose={onClose}
       open={visible}
       bodyStyle={{ paddingBottom: 80 }}
       extra={
         <Space>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={onClose}>取消</Button>
           <Button 
             type="primary" 
             onClick={handleSave} 
             loading={loading}
             icon={<SaveOutlined />}
           >
-            Save
+            保存
           </Button>
         </Space>
       }
     >
       <Spin spinning={loading}>
         <Tabs activeKey={activeTab} onChange={setActiveTab}>
-          <TabPane tab="Configuration" key="config">
+          <TabPane tab="配置" key="config">
             <Form
               form={form}
               layout="vertical"
@@ -209,8 +209,8 @@ const ProviderDetailDrawer = ({ visible, provider, onClose, onSuccess }) => {
             >
               <Form.Item
                 name="api_key"
-                label="API Key"
-                rules={[{ required: true, message: 'Please enter API key' }]}
+                label="API 密钥"
+                rules={[{ required: true, message: '请输入 API 密钥' }]}
               >
                 <Input.Password placeholder="Enter API key" />
               </Form.Item>
@@ -218,7 +218,7 @@ const ProviderDetailDrawer = ({ visible, provider, onClose, onSuccess }) => {
               {provider?.requires_api_secret && (
                 <Form.Item
                   name="api_secret"
-                  label="API Secret"
+                  label="API 密钥"
                 >
                   <Input.Password placeholder="Enter API secret" />
                 </Form.Item>
@@ -227,7 +227,7 @@ const ProviderDetailDrawer = ({ visible, provider, onClose, onSuccess }) => {
               {provider?.requires_app_id && (
                 <Form.Item
                   name="app_id"
-                  label="Application ID"
+                  label="应用 ID"
                 >
                   <Input placeholder="Enter application ID" />
                 </Form.Item>
@@ -235,42 +235,42 @@ const ProviderDetailDrawer = ({ visible, provider, onClose, onSuccess }) => {
               
               <Form.Item
                 name="api_base_url"
-                label="API Base URL"
+                label="API 基础 URL"
               >
                 <Input placeholder="Enter API base URL" />
               </Form.Item>
               
               <Form.Item
                 name="api_version"
-                label="API Version"
+                label="API 版本"
               >
                 <Input placeholder="Enter API version" />
               </Form.Item>
               
               <Form.Item
                 name="region"
-                label="Region"
+                label="区域"
               >
                 <Input placeholder="Enter region" />
               </Form.Item>
               
               <Form.Item
                 name="request_timeout"
-                label="Request Timeout (seconds)"
+                label="请求超时时间（秒）"
               >
                 <InputNumber min={1} max={300} />
               </Form.Item>
               
               <Form.Item
                 name="max_retries"
-                label="Max Retries"
+                label="最大重试次数"
               >
                 <InputNumber min={0} max={10} />
               </Form.Item>
               
               <Form.Item
                 name="default_model"
-                label="Default Model"
+                label="默认模型"
               >
                 <Select
                   placeholder="Select default model"
@@ -288,10 +288,10 @@ const ProviderDetailDrawer = ({ visible, provider, onClose, onSuccess }) => {
             </Form>
           </TabPane>
           
-          <TabPane tab="API Test" key="test">
+          <TabPane tab="API 测试" key="test">
             <Alert
-              message="API Test"
-              description="Test your configuration by sending a request to the API. This will use the configuration values you've entered but will not save them."
+              message="API 测试"
+              description="通过向 API 发送请求测试您的配置。这将使用您输入的配置值，但不会保存它们。"
               type="info"
               showIcon
               style={{ marginBottom: 16 }}
@@ -303,17 +303,17 @@ const ProviderDetailDrawer = ({ visible, provider, onClose, onSuccess }) => {
               loading={testLoading}
               icon={<ApiOutlined />}
             >
-              Test API Connection
+              测试 API 连接
             </Button>
             
             {renderTestResult()}
           </TabPane>
           
-          <TabPane tab="Models" key="models">
+          <TabPane tab="模型" key="models">
             <div style={{ marginBottom: 16 }}>
-              <Title level={5}>Available Models</Title>
+              <Title level={5}>可用模型</Title>
               <Text type="secondary">
-                These are the models available for this provider. The default model can be selected in the Configuration tab.
+                这些是此提供商可用的模型。默认模型可以在“配置”选项卡中选择。
               </Text>
             </div>
             
@@ -333,7 +333,7 @@ const ProviderDetailDrawer = ({ visible, provider, onClose, onSuccess }) => {
                 ))}
               </ul>
             ) : (
-              <Text type="secondary">No models available or you need to configure and test the API first.</Text>
+              <Text type="secondary">没有可用的模型，或者您需要先配置并测试 API。</Text>
             )}
           </TabPane>
         </Tabs>

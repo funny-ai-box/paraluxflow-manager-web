@@ -102,25 +102,45 @@ const Feeds = () => {
     }
   };
 
+  // 截断长ID的函数
+  const truncateId = (id) => {
+    if (!id || typeof id !== 'string') return id;
+    if (id.length > 8) {
+      return (
+        <Tooltip title={id}>
+          {id.substring(0, 8)}...
+        </Tooltip>
+      );
+    }
+    return id;
+  };
+
   const columns = [
     {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
-      width: 50,
+      width: 100,
+      render: truncateId, // 使用截断函数显示ID
     },
     {
       title: 'Logo',
       dataIndex: 'logo',
       key: 'logo',
-      width: 100,
-      render: (logo) => logo ? <Image src={logo} alt="Logo" width={50} height={50} preview={false} /> : null
+      width: 80,
+      render: (logo) => logo ? <Image src={logo} alt="Logo" width={40} height={40} preview={false} /> : null
     },
     {
       title: '标题',
       dataIndex: 'title',
       key: 'title',
       width: 180,
+      ellipsis: true, // 启用省略
+      render: (text) => (
+        <Tooltip title={text}>
+          <span>{text}</span>
+        </Tooltip>
+      )
     },
     {
       title: '描述',
@@ -144,7 +164,9 @@ const Feeds = () => {
       ellipsis: true,
       render: (url) => url ? (
         <Tooltip title={url}>
-          <a href={url} target="_blank" rel="noopener noreferrer">{url}</a>
+          <a href={url} target="_blank" rel="noopener noreferrer">
+            {url.length > 25 ? `${url.substring(0, 25)}...` : url}
+          </a>
         </Tooltip>
       ) : 'N/A'
     },
@@ -171,7 +193,7 @@ const Feeds = () => {
       title: '状态',
       dataIndex: 'last_fetch_status',
       key: 'last_fetch_status',
-      width: 100,
+      width: 80,
       render: (status) => {
         if (status === 1) return <Text type="success">成功</Text>;
         if (status === 2) return <Text type="danger">失败</Text>;
@@ -188,6 +210,7 @@ const Feeds = () => {
           checked={active}
           onChange={(checked) => handleChangeFeedStatus(checked, record)}
           loading={loading}
+          size="small"
         />
       ),
     },
@@ -195,6 +218,7 @@ const Feeds = () => {
       title: '操作',
       key: 'action',
       width: 100,
+      fixed: 'right', // 固定在右侧
       render: (_, record) => (
         <a
           key="view"
@@ -264,6 +288,7 @@ const Feeds = () => {
             pagination={pagination}
             onChange={handleTableChange}
             scroll={{ x: 1300 }}
+            size="middle" // 使用更紧凑的表格布局
           />
         </Space>
       </Card>
