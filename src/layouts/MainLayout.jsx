@@ -1,4 +1,4 @@
-// src/layouts/MainLayout.jsx - Updated with new navigation items
+// src/layouts/MainLayout.jsx
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -10,12 +10,14 @@ import {
   FileSearchOutlined,
   SettingOutlined,
   AlertOutlined,
+  RobotOutlined,
+  LogoutOutlined
 } from '@ant-design/icons';
-import { Layout, Menu, Button, theme, Avatar, Breadcrumb } from 'antd';
+import { Layout, Menu, Button, theme, Avatar, Breadcrumb, Dropdown } from 'antd';
 
 const { Header, Sider, Content } = Layout;
 
-// Define menu items directly
+// Define updated menu items with LLM providers section
 const menuItems = [
   {
     key: '/',
@@ -37,27 +39,23 @@ const menuItems = [
       },
     ],
   },
-  
+
   {
-    key: 'crawler',
-    icon: <FileSearchOutlined />,
-    label: '爬虫',
+    key: 'llm',
+    icon: <RobotOutlined />,
+    label: 'LLM 管理',
     children: [
       {
-        key: '/crawler/execution',
-        label: '执行任务',
+        key: '/llm/providers',
+        label: '提供商',
       },
       {
-        key: '/crawler/content-execution',
-        label: '内容抓取',
+        key: '/llm/models',
+        label: '模型',
       },
     ],
   }
- 
 ];
-
-// Generate breadcrumb items
-// src/layouts/MainLayout.jsx (Continued)
 
 // Generate breadcrumb items
 const generateBreadcrumb = (pathname) => {
@@ -121,6 +119,30 @@ const MainLayout = () => {
   const handleMenuClick = ({ key }) => {
     navigate(key);
   };
+
+  // Handle logout
+  const handleLogout = () => {
+    // Clear user data from local storage
+    localStorage.removeItem('token');
+    // Redirect to login page
+    navigate('/auth/login');
+  };
+
+  // User menu items
+  const userMenuItems = [
+    {
+      key: 'profile',
+      icon: <UserOutlined />,
+      label: '个人设置',
+      onClick: () => navigate('/user/profile')
+    },
+    {
+      key: 'logout',
+      icon: <LogoutOutlined />,
+      label: '退出登录',
+      onClick: handleLogout
+    }
+  ];
 
   // Generate breadcrumb items
   const breadcrumbItems = generateBreadcrumb(pathname);
@@ -208,7 +230,13 @@ const MainLayout = () => {
               style={{ marginRight: 16 }}
               onClick={() => navigate('/system')}
             />
-            <Avatar icon={<UserOutlined />} />
+            <Dropdown 
+              menu={{ items: userMenuItems }} 
+              placement="bottomRight"
+              trigger={['click']}
+            >
+              <Avatar style={{ cursor: 'pointer' }} icon={<UserOutlined />} />
+            </Dropdown>
           </div>
         </Header>
         <div style={{ padding: '16px 16px 0', background: token.colorBgContainer }}>

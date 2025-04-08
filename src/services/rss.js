@@ -1,38 +1,17 @@
+// src/services/rss.js
 import request from '@/utils/request';
 
 // Feed list
 export async function fetchRssFeeds(params = {}) {
-  return request('/api/feed/list', {
-    method: 'GET',
-    data: params
-  });
-}
-
-// Available feeds
-export async function fetchRssAvailableFeeds(params = {}) {
-  return request('/api/v1/rss/available_feeds', {
+  return request('/api/v1/rss/feed/list', {
     method: 'GET',
     params
   });
 }
 
-// Feed collections
-export async function fetchRssFeedCollections() {
-  return request('/api/v1/rss/feed_collections', {
-    method: 'GET'
-  });
-}
-
-// Feed categories
-export async function fetchRssFeedCategories() {
-  return request('/api/feed/categories', {
-    method: 'GET'
-  });
-}
-
 // Feed detail
 export async function fetchRssFeedDetail(id) {
-  return request(`/api/feed/detail`, {
+  return request(`/api/v1/rss/feed/detail`, {
     method: 'GET',
     params: { feed_id: id }
   });
@@ -40,7 +19,7 @@ export async function fetchRssFeedDetail(id) {
 
 // Get article content from URL
 export async function fetchArtcileHtmlByUrl(url) {
-  return request(`/api/feed/article/get_content_from_url`, {
+  return request(`/api/v1/article/get_content_from_url`, {
     method: 'GET',
     params: { url }
   });
@@ -52,7 +31,7 @@ export async function fetchRssFeedArticles({
   page = 1,
   pageSize = 10,
 }) {
-  return request(`/api/feed/articles`, {
+  return request(`/api/v1/article/list`, {
     method: 'GET',
     params: {
       feed_id: id,
@@ -64,17 +43,25 @@ export async function fetchRssFeedArticles({
 
 // Sync feed articles
 export async function syncFeedArticles(id) {
-  return request(`/api/feed/sync_articles`, {
+  return request(`/api/v1/article/sync`, {
     method: 'POST',
     data: { feed_id: id }
   });
 }
 
+// Batch sync feed articles
+export async function batchSyncFeedArticles(feed_ids) {
+  return request(`/api/v1/article/batch_sync`, {
+    method: 'POST',
+    data: { feed_ids }
+  });
+}
+
 // Test feed link content crawler
-export async function fetchRssFeedLinkContentCrawlerTest(link) {
-  return request(`/api/v1/rss/test_feed_link_content_crawler`, {
-    method: 'GET',
-    params: { link }
+export async function testFeedLinkCrawlerScript(options) {
+  return request(`/api/v1/rss/test_html_content_crawler_script`, {
+    method: 'POST',
+    data: options
   });
 }
 
@@ -117,14 +104,6 @@ export async function updateFeedStatus(options = {}) {
   });
 }
 
-// Test feed link crawler script
-export async function testFeedLinkCrawlerScript(options = {}) {
-  return request('/api/v1/rss/test_html_content_crawler_script', {
-    method: 'POST',
-    data: options
-  });
-}
-
 // Publish RSS feed script
 export async function publishRssFeedScript(options = {}) {
   return request('/api/v1/rss/publish_feed_script', {
@@ -146,14 +125,6 @@ export async function fetchRssFeedCrawlerScripts(feed_id) {
   return request('/api/v1/rss/feed_crawl_scripts', {
     method: 'GET',
     params: { feed_id }
-  });
-}
-
-// Fetch RSS feed crawler script by ID
-export async function fetchRssFeedCrawlerScriptById(id) {
-  return request('/api/v1/rss/get_script_by_id', {
-    method: 'GET',
-    params: { id }
   });
 }
 
@@ -181,10 +152,11 @@ export async function publishRssGroupCrawlerScript(options = {}) {
   });
 }
 
-// Synchronous feed service
-export async function SynchronousFeedService(options = {}) {
-  return request('/api/v1/rss/group/SynchronousFeed', {
-    method: 'POST',
-    data: options
+
+
+
+export async function fetchRssFeedCategories() {
+  return request('/api/v1/rss/feed/categories', {
+    method: 'GET'
   });
 }

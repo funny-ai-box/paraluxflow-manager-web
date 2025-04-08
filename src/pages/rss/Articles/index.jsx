@@ -1,94 +1,70 @@
-import { fetchArticleDetail, fetchArticleList } from '@/services/article';
-import { createArticleContentExecution } from '@/services/crawler';
+import React, { useState } from 'react';
+import { 
+  Button,
+  Col, 
+  Drawer, 
+  Row, 
+  Tag, 
+  message, 
+  Image, 
+  Tooltip, 
+  Space 
+} from 'antd';
+import { SyncOutlined, EyeOutlined, ReloadOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
-import { Button, Col, Drawer, Row, Tag, message, Image, Tooltip } from 'antd';
-import { useEffect, useState } from 'react';
 
-const StatusTag = ({ status }) => {
-  const statusMap = {
-    0: { color: 'orange', text: '等待' },
-    1: { color: 'green', text: '成功' },
-    2: { color: 'red', text: '失败' },
+import { fetchArticleDetail, fetchArticleList, resetArticle } from '@/services/article';
 
-  };
-  const { color, text } = statusMap[status] || { color: 'grey', text: 'Unknown' };
-  return <Tag color={color}>{text}</Tag>;
-};
+import HtmlContentViewer from '../Feeds/components/HtmlContentViewer';
 
 const ArticleTable = () => {
-  const [articles, setArticles] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [current, setCurrent] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [total, setTotal] = useState(0);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [currentArticle, setCurrentArticle] = useState({});
   const [articleContent, setArticleContent] = useState({ html_content: '', text_content: '' });
-  const [searchParams, setSearchParams] = useState({
-    title: '',
-    feed_title: '',
-    status: undefined,
-    date_range: [],
-  });
+  const [loading, setLoading] = useState(false);
 
-  const fetchArticles = async (params = {}) => {
-    setLoading(true);
+
+
+  const handleResetArticle = async (record) => {
     try {
-      // Format date range if it exists
-      const formattedParams = {
-        ...params,
-        start_date: params.date_range?.[0]?.format('YYYY-MM-DD'),
-        end_date: params.date_range?.[1]?.format('YYYY-MM-DD'),
-      };
-      
-      // Remove the original date_range parameter
-      delete formattedParams.date_range;
-      
-      const response = await fetchArticleList(formattedParams);
-      if (response.code === 200) {
-        setArticles(response.data.list);
-        setTotal(response.data.total);
+      const result = await resetArticle(record.id);
+      if (result.code === 200) {
+        message.success('Article reset successfully');
+        return true;
       } else {
-        message.error('Failed to fetch articles');
+        message.error(result.message || 'Failed to reset article');
+        return false;
       }
     } catch (error) {
-      console.error('Fetch error:', error);
-      message.error('An error occurred while fetching articles');
-    }
-    setLoading(false);
-  };
-
-
-
-  useEffect(() => {
-    fetchArticles(current, pageSize, searchParams);
-  }, [current, pageSize]);
-
- 
-
-  const handleCrawlContent = async (record) => {
-    const result = await createArticleContentExecution({
-      article_id: record.id,
-    });
-    if (result.code === 200) {
-      message.success('Crawling content successfully');
-      fetchArticles(current, pageSize, searchParams);
-    } else {
-      message.error(result.message);
+      console.error('Error resetting article:', error);
+      message.error('An error occurred while resetting the article');
+      return false;
     }
   };
 
   const handleViewContent = async (record) => {
     setCurrentArticle(record);
     setDrawerVisible(true);
-    const response = await fetchArticleDetail(record.id);
-
-    if (response.code === 200) {
-      if (response.data.content) {
-        setArticleContent(response.data.content);
+    setLoading(true);
+    
+    try {
+      const response = await fetchArticleDetail(record.id);
+      setLoading(false);
+      
+      if (response.code === 200) {
+        if (response.data.content) {
+          setArticleContent(response.data.content);
+        } else {
+          setArticleContent({ html_content: '', text_content: '' });
+          message.info('No content available for this article');
+        }
+      } else {
+        message.error(response.message || 'Failed to fetch article content');
       }
-    } else {
-      message.error('Failed to fetch article content');
+    } catch (error) {
+      setLoading(false);
+      console.error('Error fetching article content:', error);
+      message.error('An error occurred while fetching article content');
     }
   };
 
@@ -97,22 +73,46 @@ const ArticleTable = () => {
     setArticleContent({ html_content: '', text_content: '' });
   };
 
+  const StatusTag = ({ status, errorMessage }) => {
+    const statusMap = {
+      0: { color: 'orange', text: 'Pending' },
+      1: { color: 'green', text: 'Success' },
+      2: { color: 'red', text: 'Failed' },
+    };
+    
+    const { color, text } = statusMap[status] || { color: 'default', text: 'Unknown' };
+    
+    return (
+      <Space>
+        <Tag color={color}>{text}</Tag>
+        {status === 2 && errorMessage && (
+          <Tooltip title={errorMessage}>
+            <Tag color="red">Error</Tag>
+          </Tooltip>
+        )}
+      </Space>
+    );
+  };
+
   const columns = [
     {
       title: 'ID',
       dataIndex: 'id',
       width: 80,
+      search: false,
     },
     {
       title: 'Thumbnail',
       dataIndex: 'thumbnail_url',
       width: 120,
+      search: false,
       render: (url) => url ? (
         <Image
           src={url}
           alt="thumbnail"
           width={100}
           height={60}
+          fallback="/default-thumbnail.png"
           style={{ objectFit: 'cover' }}
         />
       ) : null,
@@ -120,63 +120,59 @@ const ArticleTable = () => {
     {
       title: 'Title',
       dataIndex: 'title',
-      width: 200,
+      width: 250,
       ellipsis: true,
       search: true,
     },
-  
+    {
+      title: 'Feed',
+      dataIndex: 'feed_title',
+      width: 150,
+      ellipsis: true,
+      search: true,
+    },
     {
       title: 'Summary',
       dataIndex: 'summary',
       width: 300,
       ellipsis: true,
-      
+      search: false,
     },
     {
       title: 'Link',
       dataIndex: 'link',
-      width: 180,
-      render: (text) => (
+      width: 100,
+      ellipsis: true,
+      search: false,
+      render: (text) => text ? (
         <a href={text} target="_blank" rel="noopener noreferrer">
-          {text}
+          Open Link
         </a>
-      ),
-    },
-    {
-      title: 'Feed',
-      dataIndex: 'feed_id',
-      width: 180,
-      search: true,
+      ) : null,
     },
     {
       title: 'Status',
       dataIndex: 'status',
       width: 120,
       valueEnum: {
-        0: { text: '等待拉取', status: 'warning' },
-        1: { text: '成功拉取', status: 'success' },
-        2: { text: '失败', status: 'error' },
-  
+        0: { text: 'Pending', status: 'warning' },
+        1: { text: 'Success', status: 'success' },
+        2: { text: 'Failed', status: 'error' },
       },
       render: (_, record) => (
-        <div>
-         
-            <StatusTag status={record.status} />
-          { record.status===2&&record.error_message && (
-             <span style={{ marginLeft: 8, color: 'red', cursor: 'pointer' }}>{record.error_message}</span>
-          )}
-         
-          
-        </div>
+        <StatusTag 
+          status={record.status} 
+          errorMessage={record.error_message} 
+        />
       ),
     },
-
     {
       title: 'Published At',
       dataIndex: 'published_date',
       valueType: 'dateTime',
       width: 180,
       sorter: true,
+      search: false,
     },
     {
       title: 'Created At',
@@ -184,27 +180,33 @@ const ArticleTable = () => {
       valueType: 'dateTime',
       width: 180,
       sorter: true,
+      search: false,
     },
-    
     {
-      title: 'Options',
+      title: 'Actions',
       valueType: 'option',
-      width: 160,
+      width: 180,
       render: (_, record) => [
-        <Button 
-          key="crawl"
-          type="primary"
-          size="small"
-          disabled={record.is_locked}
-          onClick={() => handleCrawlContent(record)}
-        >
-          {record.status === 1 ? 'Re-Crawl' : 'Crawl'}
-        </Button>,
+       
+        record.status === 2 && (
+          <Button
+            key="reset"
+            type="default"
+            size="small"
+            danger
+            icon={<ReloadOutlined />}
+            onClick={() => handleResetArticle(record)}
+            style={{ marginRight: 8 }}
+          >
+            Reset
+          </Button>
+        ),
         record.status === 1 && (
-          <Button 
-            key="view" 
-            type="link" 
-            size="small" 
+          <Button
+            key="view"
+            type="link"
+            size="small"
+            icon={<EyeOutlined />}
             onClick={() => handleViewContent(record)}
           >
             View
@@ -214,34 +216,50 @@ const ArticleTable = () => {
     },
   ];
 
-  const totalWidth = columns.reduce((total, col) => total + (col.width || 0), 0);
-
   return (
     <div style={{ width: '100%', overflow: 'hidden' }}>
       <ProTable
-        scroll={{ x: totalWidth }}
         columns={columns}
-        dataSource={articles}
-        loading={loading}
+        request={async (params, sort, filter) => {
+          // Format params for the API
+          const { current, pageSize, ...restParams } = params;
+          
+          // Convert ProTable params to API params
+          const apiParams = {
+            page: current,
+            per_page: pageSize,
+            ...restParams,
+          };
+          
+          try {
+            const response = await fetchArticleList(apiParams);
+            
+            if (response.code === 200) {
+              return {
+                data: response.data.list,
+                success: true,
+                total: response.data.total,
+              };
+            } else {
+              message.error(response.message || 'Failed to fetch articles');
+              return {
+                data: [],
+                success: false,
+              };
+            }
+          } catch (error) {
+            console.error('Error fetching articles:', error);
+            message.error('An error occurred while fetching articles');
+            return {
+              data: [],
+              success: false,
+            };
+          }
+        }}
         rowKey="id"
         pagination={{
           showQuickJumper: true,
           showSizeChanger: true,
-          total,
-        }}
-        request={async (params) => {
-          // 这里将 ProTable 的请求参数转换为后端接口所需的格式
-          const { current, pageSize, ...restParams } = params;
-          await fetchArticles({
-            page: current,
-            per_page: pageSize,
-            ...restParams,
-          });
-          return {
-            data: articles,
-            total,
-            success: true,
-          };
         }}
         search={{
           labelWidth: 'auto',
@@ -249,24 +267,30 @@ const ArticleTable = () => {
         }}
         dateFormatter="string"
         headerTitle="Article List"
-        toolBarRender={() => [
-          <Button 
-            key="refresh" 
-            type="primary"
-            onClick={() => {
-              const actionRef = ProTable.useActionRef();
-              if (actionRef.current) {
-                actionRef.current.reload();
-              }
-            }}
-          >
-            Refresh
-          </Button>
-        ]}
+        toolbar={{
+          actions: [
+            <Button 
+              key="refresh" 
+              type="primary"
+              icon={<ReloadOutlined />}
+              onClick={() => {
+                // Refresh the table
+                const actionRef = ProTable.useActionRef();
+                if (actionRef.current) {
+                  actionRef.current.reload();
+                }
+              }}
+            >
+              Refresh
+            </Button>
+          ],
+        }}
+        scroll={{ x: 'max-content' }}
       />
+      
       <Drawer
         title={currentArticle?.title}
-        width={1440}
+        width={1200}
         onClose={closeDrawer}
         open={drawerVisible}
         bodyStyle={{ paddingBottom: 80 }}
@@ -274,19 +298,14 @@ const ArticleTable = () => {
         <Row gutter={16}>
           <Col span={12}>
             <h3>HTML Content</h3>
-            <div
-              style={{
-                maxWidth: '100%',
-                overflowX: 'auto',
-                overflowY: 'auto',
-                height: 'calc(100vh - 200px)',
-                boxSizing: 'border-box',
-                padding: '16px',
-                border: '1px solid #f0f0f0',
-                borderRadius: '4px',
-              }}
-              dangerouslySetInnerHTML={{ __html: articleContent.html_content }}
-            />
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '40px 0' }}>
+                <SyncOutlined spin style={{ fontSize: 24 }} />
+                <p>Loading content...</p>
+              </div>
+            ) : (
+              <HtmlContentViewer htmlContent={articleContent.html_content} />
+            )}
           </Col>
           <Col span={12}>
             <h3>Text Content</h3>
@@ -302,7 +321,14 @@ const ArticleTable = () => {
                 whiteSpace: 'pre-wrap',
               }}
             >
-              {articleContent.text_content}
+              {loading ? (
+                <div style={{ textAlign: 'center', padding: '40px 0' }}>
+                  <SyncOutlined spin style={{ fontSize: 24 }} />
+                  <p>Loading content...</p>
+                </div>
+              ) : (
+                articleContent.text_content || 'No text content available'
+              )}
             </div>
           </Col>
         </Row>

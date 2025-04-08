@@ -1,7 +1,7 @@
 import {
   addNewFeed,
   fetchRssFeedCategories,
-  fetchRssFeedCollections,
+ 
   getGroupList,
 } from '@/services/rss';
 import { InfoCircleOutlined, LinkOutlined, PlusOutlined } from '@ant-design/icons';
@@ -18,17 +18,12 @@ import { useEffect, useState } from 'react';
 const { Text } = Typography;
 
 const CreateNewFeed = () => {
-  const [, setFeedCollections] = useState([]);
+
   const [feedCategories, setFeedCategories] = useState([]);
   const [fileList, setFileList] = useState([]);
   const [drawerVisible, setDrawerVisible] = useState(false);
 
-  const getFeedCollections = async () => {
-    const result = await fetchRssFeedCollections();
-    if (result.code === 200) {
-      setFeedCollections(result.data);
-    }
-  };
+
 
   const getFeedCategories = async () => {
     const result = await fetchRssFeedCategories();
@@ -100,7 +95,7 @@ const CreateNewFeed = () => {
   };
 
   useEffect(() => {
-    getFeedCollections();
+
     getFeedCategories();
   }, []);
 

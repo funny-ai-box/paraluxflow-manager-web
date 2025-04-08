@@ -10,6 +10,21 @@ const ErrorShowType = {
   REDIRECT: 9,
 };
 
+// Auth helper functions
+const AUTH_TOKEN_KEY = 'auth_token';
+
+const saveAuthToken = (token) => {
+  localStorage.setItem(AUTH_TOKEN_KEY, token);
+};
+
+const getAuthToken = () => {
+  return localStorage.getItem(AUTH_TOKEN_KEY);
+};
+
+const clearAuthToken = () => {
+  localStorage.removeItem(AUTH_TOKEN_KEY);
+};
+
 // Create axios instance
 const instance = axios.create({
   baseURL: '',
@@ -22,8 +37,8 @@ const instance = axios.create({
 // Request interceptor
 instance.interceptors.request.use(
   (config) => {
-    // Add token if needed
-    const token = localStorage.getItem('token');
+    // Add Bearer token if available
+    const token = getAuthToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -54,20 +69,23 @@ instance.interceptors.response.use(
   }
 );
 
+// Redirect to login page
+const redirectToLogin = () => {
+  clearAuthToken();
+  // Use window.location to force a full page reload
+  window.location.href = '/auth/login';
+};
+
 // Error handler
 const handleError = (error) => {
   if (error.response) {
     // Server responded with non-2xx status
     const status = error.response.status;
     
-    if (status === 401) {
-      // Unauthorized - redirect to login
-      message.error('Unauthorized, please login again');
-      // Clear user data and redirect
-      localStorage.removeItem('token');
-      window.location.href = '/user/login';
-    } else if (status === 403) {
-      message.error('Forbidden access');
+    if (status === 401 || status === 403) {
+      // Unauthorized or Forbidden - redirect to login
+      message.error('Authentication required, please login again');
+      redirectToLogin();
     } else if (status === 404) {
       message.error('Resource not found');
     } else if (status === 500) {
@@ -110,30 +128,26 @@ const handleError = (error) => {
   }
 };
 
-// Request function
+// Request function - simplified to only handle GET and POST
 const request = async (url, options = {}) => {
   try {
     // Method defaults to GET
     const method = options.method || 'GET';
     
-    // Handle different request methods
+    // Handle GET and POST methods only
     if (method === 'GET') {
       return instance.get(url, { params: options.params });
     } else if (method === 'POST') {
       return instance.post(url, options.data, { params: options.params });
-    } else if (method === 'PUT') {
-      return instance.put(url, options.data, { params: options.params });
-    } else if (method === 'DELETE') {
-      return instance.delete(url, { data: options.data, params: options.params });
     } else {
-      return instance.request({
-        url,
-        ...options,
-      });
+      console.warn(`Unsupported method: ${method}. Using POST as fallback.`);
+      return instance.post(url, options.data, { params: options.params });
     }
   } catch (error) {
     return Promise.reject(error);
   }
 };
 
+// Export auth functions to be used in auth service
+export { saveAuthToken, getAuthToken, clearAuthToken };
 export default request;

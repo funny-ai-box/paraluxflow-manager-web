@@ -18,9 +18,6 @@ import Feeds from '../pages/rss/Feeds';
 import FeedDetail from '../pages/rss/Feeds/Detail';
 import Articles from '../pages/rss/Articles';
 
-// 爬虫页面
-import Execution from '../pages/crawler/Execution';
-import ContentExecution from '../pages/crawler/ContentExecution';
 
 /**
  * 统一的路由配置，用于生成路由表和导航菜单
@@ -73,31 +70,7 @@ export const routes = [
           },
         ],
       },
-      {
-        path: 'crawler',
-        component: null,
-        redirect: '/crawler/execution',
-        menu: {
-          icon: <FileTextOutlined />,
-          label: '爬虫',
-        },
-        children: [
-          {
-            path: 'execution',
-            component: Execution,
-            menu: {
-              label: '执行任务',
-            },
-          },
-          {
-            path: 'content-execution',
-            component: ContentExecution,
-            menu: {
-              label: '内容抓取',
-            },
-          },
-        ],
-      },
+     
       {
         path: '*',
         component: NotFoundPage,

@@ -1,4 +1,4 @@
-// src/router.jsx - Updated with new routes
+// src/router.jsx
 import { createBrowserRouter } from 'react-router-dom';
 
 // Import layouts
@@ -13,13 +13,33 @@ import Feeds from './pages/rss/Feeds';
 import FeedDetail from './pages/rss/Feeds/Detail';
 import Articles from './pages/rss/Articles';
 
-// Crawler Pages
-import Execution from './pages/crawler/Execution';
-import ContentExecution from './pages/crawler/ContentExecution';
 
+// LLM Pages (new)
+import LlmProviders from './pages/llm/Providers';
+import LlmModels from './pages/llm/Models';
+
+// Auth Pages (new)
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
 
 // Create the router with direct route definitions
 const router = createBrowserRouter([
+  // Auth Routes
+  {
+    path: '/auth',
+    children: [
+      {
+        path: 'login',
+        element: <Login />
+      },
+      {
+        path: 'register',
+        element: <Register />
+      }
+    ]
+  },
+  
+  // Main Application Routes
   {
     path: '/',
     element: <MainLayout />,
@@ -28,6 +48,7 @@ const router = createBrowserRouter([
         path: '/',
         element: <Welcome />,
       },
+      
       // RSS Management
       {
         path: '/rss-manager/feeds',
@@ -41,18 +62,17 @@ const router = createBrowserRouter([
         path: '/rss-manager/articles',
         element: <Articles />,
       },
+
       
-      // Crawler
+      // LLM Providers (new)
       {
-        path: '/crawler/execution',
-        element: <Execution />,
+        path: '/llm/providers',
+        element: <LlmProviders />,
       },
       {
-        path: '/crawler/content-execution',
-        element: <ContentExecution />,
+        path: '/llm/models',
+        element: <LlmModels />,
       },
-      
-     
       
       // 404 page
       {
