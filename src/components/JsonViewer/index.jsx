@@ -1,9 +1,8 @@
-// src/components/JsonViewer/index.jsx
-import React, { useState } from 'react';
-import { Tree, Typography, Switch, Space, Input, Card } from 'antd';
-import { DownOutlined, CopyOutlined, SearchOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Tree, Typography, Switch, Space, Input, Card, Empty, Tooltip } from 'antd';
+import { DownOutlined, CopyOutlined, SearchOutlined, InfoCircleOutlined } from '@ant-design/icons';
 
-const { Text } = Typography;
+const { Text, Title } = Typography;
 
 /**
  * 自定义的 JSON 数据查看器
@@ -22,6 +21,8 @@ const JsonViewer = ({
   collapsed = true,
   enableClipboard = true,
   displayDataTypes = true,
+  emptyText = '暂无数据',
+  title = 'JSON 数据查看器'
 }) => {
   const [searchValue, setSearchValue] = useState('');
   const [expandedKeys, setExpandedKeys] = useState([]);
@@ -31,10 +32,10 @@ const JsonViewer = ({
   const colors = {
     light: {
       string: '#008000',
-      number: '#0000ff',
-      boolean: '#b22222',
-      null: '#808080',
-      key: '#a52a2a',
+      number: '#1677ff',
+      boolean: '#fa541c',
+      null: '#787878',
+      key: '#d46b08',
       background: '#ffffff',
       text: '#000000',
     },
@@ -88,7 +89,7 @@ const JsonViewer = ({
       const { type, display, color } = getValueDetails(value);
       
       const keyContent = (
-        <Text style={{ color: currentTheme.key }}>
+        <Text style={{ color: currentTheme.key, fontWeight: '500' }}>
           {typeof key === 'number' ? `[${key}]` : key}
         </Text>
       );
@@ -98,28 +99,34 @@ const JsonViewer = ({
           {display}
         </Text>
       ) : (
-        <Text style={{ color }}>
-          {display}
-          {showDataTypes && <Text style={{ color: '#888', marginLeft: 4 }}>{`(${type})`}</Text>}
-        </Text>
+        <Space>
+          <Text style={{ color }}>
+            {display}
+          </Text>
+          {showDataTypes && <Text style={{ color: '#888', fontSize: '12px' }}>{`(${type})`}</Text>}
+        </Space>
       );
       
       const nodeTitle = (
-        <span>
-          {keyContent}
-          {isObject ? ' : ' : ' : '}
-          {valueContent}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ flex: 1 }}>
+            {keyContent}
+            <span style={{ margin: '0 4px' }}>:</span>
+            {valueContent}
+          </div>
           {enableClipboard && (
-            <CopyOutlined 
-              style={{ marginLeft: 8, color: '#888', cursor: 'pointer' }}
-              onClick={(e) => {
-                e.stopPropagation();
-                const textToCopy = isObject ? JSON.stringify(value) : String(value);
-                navigator.clipboard.writeText(textToCopy);
-              }}
-            />
+            <Tooltip title="复制">
+              <CopyOutlined 
+                style={{ marginLeft: 8, color: '#aaa', cursor: 'pointer', fontSize: '14px' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const textToCopy = isObject ? JSON.stringify(value, null, 2) : String(value);
+                  navigator.clipboard.writeText(textToCopy);
+                }}
+              />
+            </Tooltip>
           )}
-        </span>
+        </div>
       );
       
       const treeNode = {
@@ -174,38 +181,87 @@ const JsonViewer = ({
     const keys = searchInTree(treeData);
     setExpandedKeys([...new Set(keys)]);
   };
+
+  useEffect(() => {
+    // 如果不是默认折叠，则展开所有节点
+    if (!collapsed) {
+      const getAllKeys = (nodes, keys = []) => {
+        if (!nodes) return keys;
+        
+        nodes.forEach(node => {
+          keys.push(node.key);
+          if (node.children) {
+            getAllKeys(node.children, keys);
+          }
+        });
+        
+        return keys;
+      };
+      
+      setExpandedKeys(getAllKeys(treeData));
+    }
+  }, [collapsed, src]);
+  
+  // 如果没有数据，显示空状态
+  if (!src || (Array.isArray(src) && src.length === 0) || (typeof src === 'object' && Object.keys(src).length === 0)) {
+    return (
+      <Card 
+        title={title}
+        bordered={true}
+        style={{ background: currentTheme.background }}
+      >
+        <Empty description={emptyText} />
+      </Card>
+    );
+  }
   
   return (
     <Card
-      title="JSON Viewer"
+      title={
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Title level={5} style={{ margin: 0 }}>{title}</Title>
+          <Space>
+            <Input
+              prefix={<SearchOutlined />}
+              placeholder="搜索..."
+              value={searchValue}
+              onChange={(e) => onSearch(e.target.value)}
+              style={{ width: 200 }}
+              allowClear
+            />
+            <Tooltip title="显示/隐藏数据类型">
+              <Switch
+                checked={showDataTypes}
+                onChange={setShowDataTypes}
+                checkedChildren="显示类型"
+                unCheckedChildren="隐藏类型"
+                size="small"
+              />
+            </Tooltip>
+          </Space>
+        </div>
+      }
       bordered={true}
       style={{ background: currentTheme.background }}
-      bodyStyle={{ maxHeight: '600px', overflow: 'auto' }}
-      extra={
-        <Space>
-          <Input
-            prefix={<SearchOutlined />}
-            placeholder="搜索..."
-            value={searchValue}
-            onChange={(e) => onSearch(e.target.value)}
-            style={{ width: 200 }}
-          />
-          <Switch
-            checkedChildren="显示类型"
-            unCheckedChildren="隐藏类型"
-            checked={showDataTypes}
-            onChange={setShowDataTypes}
-          />
-        </Space>
-      }
+      bodyStyle={{ 
+        maxHeight: '600px', 
+        overflow: 'auto',
+        padding: '12px 24px'
+      }}
     >
+      <div style={{ marginBottom: 8 }}>
+        <Text type="secondary">
+          <InfoCircleOutlined style={{ marginRight: 8 }} />
+          {Array.isArray(src) ? `数组 (${src.length} 项)` : `对象 (${Object.keys(src).length} 个键值对)`}
+        </Text>
+      </div>
       <Tree
-        showLine
+        showLine={{ showLeafIcon: false }}
         switcherIcon={<DownOutlined />}
-        defaultExpandAll={!collapsed}
         expandedKeys={expandedKeys}
         onExpand={setExpandedKeys}
         treeData={treeData}
+        blockNode
       />
     </Card>
   );

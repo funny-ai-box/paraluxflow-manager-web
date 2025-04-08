@@ -8,13 +8,17 @@ import {
   message, 
   Space, 
   Divider,
-  Layout
+  Layout,
+  Checkbox,
+  Row,
+  Col
 } from 'antd';
 import { 
   UserOutlined, 
   LockOutlined, 
   MobileOutlined,
-  LoginOutlined
+  LoginOutlined,
+  SafetyOutlined
 } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { login, getPublicKey, setToken, isAuthenticated } from '@/services/auth';
@@ -30,12 +34,12 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is already logged in
+    // 检查用户是否已登录
     if (isAuthenticated()) {
       navigate('/');
     }
     
-    // Fetch public key for password encryption
+    // 获取公钥用于密码加密
     fetchPublicKey();
   }, [navigate]);
 
@@ -45,11 +49,11 @@ const Login = () => {
       if (response.code === 200) {
         setPublicKey(response.data.public_key);
       } else {
-        message.error(response.message || 'Failed to fetch public key');
+        message.error(response.message || '获取公钥失败');
       }
     } catch (error) {
-      console.error('Error fetching public key:', error);
-      message.error('An error occurred while fetching the public key');
+      console.error('获取公钥时出错:', error);
+      message.error('获取公钥时发生错误');
     }
   };
 
@@ -61,7 +65,7 @@ const Login = () => {
       encrypt.setPublicKey(publicKey);
       return encrypt.encrypt(password);
     } catch (error) {
-      console.error('Encryption error:', error);
+      console.error('加密错误:', error);
       return password;
     }
   };
@@ -70,7 +74,7 @@ const Login = () => {
     setLoading(true);
     
     try {
-      // Encrypt password if public key is available
+      // 如果公钥可用，则加密密码
       const encryptedPassword = encryptPassword(values.password);
       
       const loginData = {
@@ -81,105 +85,140 @@ const Login = () => {
       const response = await login(loginData);
       
       if (response.code === 200) {
-        // Save auth token
+        // 保存认证令牌
         setToken(response.data.token);
         
-        message.success('Login successful');
+        message.success('登录成功');
         navigate('/');
       } else {
-        message.error(response.message || 'Login failed');
+        message.error(response.message || '登录失败');
       }
     } catch (error) {
-      console.error('Login error:', error);
-      message.error('An error occurred during login');
+      console.error('登录错误:', error);
+      message.error('登录时发生错误');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Layout style={{ minHeight: '100vh', backgroundColor: '#f0f2f5' }}>
+    <Layout style={{ 
+      minHeight: '100vh', 
+      background: 'linear-gradient(to right, #1677ff, #4096ff)'
+    }}>
       <Content style={{ 
         display: 'flex', 
         justifyContent: 'center', 
         alignItems: 'center', 
         padding: '50px 0' 
       }}>
-        <Card 
-          style={{ 
-            width: 400, 
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-            borderRadius: 8
-          }}
-        >
-          <div style={{ textAlign: 'center', marginBottom: 24 }}>
-            <Title level={2} style={{ margin: 0 }}>
-              ParaluxFlow
-            </Title>
-            <Text type="secondary">管理后台登录</Text>
-          </div>
-          
-          <Form
-            form={form}
-            name="login"
-            layout="vertical"
-            onFinish={handleSubmit}
-            autoComplete="off"
-          >
-            <Form.Item
-              name="phone"
-              rules={[
-                { required: true, message: '请输入手机号码' },
-                { pattern: /^1\d{10}$/, message: '请输入有效的手机号码' }
-              ]}
+        <Row justify="center" align="middle">
+          <Col xs={22} sm={16} md={12} lg={8} xl={6}>
+            <Card 
+              style={{ 
+                width: '100%', 
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+                borderRadius: 12,
+                overflow: 'hidden'
+              }}
+              bodyStyle={{ padding: 36 }}
+              bordered={false}
             >
-              <Input 
-                prefix={<MobileOutlined />} 
-                placeholder="手机号码" 
+              <div style={{ textAlign: 'center', marginBottom: 32 }}>
+                <Title level={2} style={{ margin: 0, fontWeight: 600, color: '#1677ff' }}>
+                  ParaluxFlow
+                </Title>
+                <Text type="secondary" style={{ fontSize: 16 }}>管理后台登录</Text>
+              </div>
+              
+              <Form
+                form={form}
+                name="login"
+                layout="vertical"
+                onFinish={handleSubmit}
+                autoComplete="off"
                 size="large"
-              />
-            </Form.Item>
-            
-            <Form.Item
-              name="password"
-              rules={[{ required: true, message: '请输入密码' }]}
-            >
-              <Input.Password 
-                prefix={<LockOutlined />} 
-                placeholder="密码" 
-                size="large"
-              />
-            </Form.Item>
-            
-            <Form.Item>
-              <Button 
-                type="primary" 
-                htmlType="submit" 
-                loading={loading}
-                icon={<LoginOutlined />}
-                size="large"
-                block
+                requiredMark={false}
               >
-                登录
-              </Button>
-            </Form.Item>
-          </Form>
-          
-          <Divider plain>
-            <Text type="secondary">还没有账号?</Text>
-          </Divider>
-          
-          <div style={{ textAlign: 'center' }}>
-            <Space>
-              <Link to="/auth/register">
-                <Button type="link">注册新账号</Button>
-              </Link>
-              <Link to="/auth/forgot-password">
-                <Button type="link">忘记密码</Button>
-              </Link>
-            </Space>
-          </div>
-        </Card>
+                <Form.Item
+                  name="phone"
+                  rules={[
+                    { required: true, message: '请输入手机号码' },
+                    { pattern: /^1\d{10}$/, message: '请输入有效的手机号码' }
+                  ]}
+                >
+                  <Input 
+                    prefix={<MobileOutlined className="site-form-item-icon" />} 
+                    placeholder="手机号码" 
+                    size="large"
+                    style={{ borderRadius: 6 }}
+                  />
+                </Form.Item>
+                
+                <Form.Item
+                  name="password"
+                  rules={[{ required: true, message: '请输入密码' }]}
+                >
+                  <Input.Password 
+                    prefix={<LockOutlined className="site-form-item-icon" />} 
+                    placeholder="密码" 
+                    size="large"
+                    style={{ borderRadius: 6 }}
+                  />
+                </Form.Item>
+                
+                <Form.Item>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Form.Item name="remember" valuePropName="checked" noStyle>
+                      <Checkbox>自动登录</Checkbox>
+                    </Form.Item>
+                    <Link to="/auth/forgot-password" style={{ fontSize: 14 }}>
+                      忘记密码?
+                    </Link>
+                  </div>
+                </Form.Item>
+                
+                <Form.Item>
+                  <Button 
+                    type="primary" 
+                    htmlType="submit" 
+                    loading={loading}
+                    icon={<LoginOutlined />}
+                    size="large"
+                    block
+                    style={{ 
+                      height: 46, 
+                      borderRadius: 6,
+                      fontWeight: 500,
+                      fontSize: 16
+                    }}
+                  >
+                    登录
+                  </Button>
+                </Form.Item>
+              </Form>
+              
+              <Divider plain>
+                <Text type="secondary">还没有账号?</Text>
+              </Divider>
+              
+              <div style={{ textAlign: 'center' }}>
+                <Link to="/auth/register">
+                  <Button type="default" size="large" icon={<UserOutlined />} style={{ borderRadius: 6 }}>
+                    注册新账号
+                  </Button>
+                </Link>
+              </div>
+              
+              <div style={{ marginTop: 48, textAlign: 'center' }}>
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  <SafetyOutlined style={{ marginRight: 4 }} />
+                  登录即代表您同意用户协议和隐私政策
+                </Text>
+              </div>
+            </Card>
+          </Col>
+        </Row>
       </Content>
     </Layout>
   );

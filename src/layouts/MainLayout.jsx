@@ -1,4 +1,3 @@
-// src/layouts/MainLayout.jsx
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -7,17 +6,32 @@ import {
   UserOutlined,
   HomeOutlined,
   ReadOutlined,
-  FileSearchOutlined,
   SettingOutlined,
   AlertOutlined,
   RobotOutlined,
-  LogoutOutlined
+  LogoutOutlined,
+  BellOutlined,
+  AppstoreOutlined
 } from '@ant-design/icons';
-import { Layout, Menu, Button, theme, Avatar, Breadcrumb, Dropdown } from 'antd';
+import { 
+  Layout, 
+  Menu, 
+  Button, 
+  theme, 
+  Avatar, 
+  Breadcrumb, 
+  Dropdown, 
+  Space, 
+  Badge, 
+  Typography,
+  Divider,
+  Tooltip
+} from 'antd';
 
 const { Header, Sider, Content } = Layout;
+const { Text } = Typography;
 
-// Define updated menu items with LLM providers section
+// 导航菜单项
 const menuItems = [
   {
     key: '/',
@@ -31,15 +45,14 @@ const menuItems = [
     children: [
       {
         key: '/rss-manager/feeds',
-        label: '订阅源',
+        label: '订阅源管理',
       },
       {
         key: '/rss-manager/articles',
-        label: '文章',
+        label: '文章管理',
       },
     ],
   },
-
   {
     key: 'llm',
     icon: <RobotOutlined />,
@@ -47,33 +60,53 @@ const menuItems = [
     children: [
       {
         key: '/llm/providers',
-        label: '提供商',
+        label: '提供商管理',
       },
       {
         key: '/llm/models',
-        label: '模型',
+        label: '模型管理',
       },
     ],
   }
 ];
 
-// Generate breadcrumb items
+// 生成面包屑导航
 const generateBreadcrumb = (pathname) => {
+  const breadcrumbNameMap = {
+    '/': '首页',
+    '/rss-manager': 'RSS 管理',
+    '/rss-manager/feeds': '订阅源管理',
+    '/rss-manager/articles': '文章管理',
+    '/llm': 'LLM 管理',
+    '/llm/providers': '提供商管理',
+    '/llm/models': '模型管理',
+  };
+  
   const paths = pathname.split('/').filter(Boolean);
+  
+  // 处理动态路由
+  let dynamicItemName = '';
+  if (pathname.match(/^\/rss-manager\/feeds\/detail\/\d+$/)) {
+    dynamicItemName = '订阅源详情';
+  }
   
   return [
     {
       title: <Link to="/">首页</Link>,
     },
     ...paths.map((path, index) => {
-      // Convert path to title (capitalize first letter, replace hyphens with spaces)
-      const title = path
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-      
-      // Calculate path for this breadcrumb item
+      // 计算当前路径
       const url = `/${paths.slice(0, index + 1).join('/')}`;
+      
+      // 对于最后一级动态路由，使用动态名称
+      if (index === paths.length - 1 && dynamicItemName) {
+        return {
+          title: dynamicItemName
+        };
+      }
+      
+      // 一般路径处理
+      const title = breadcrumbNameMap[url] || path.charAt(0).toUpperCase() + path.slice(1);
       
       return {
         title: index === paths.length - 1 ? title : <Link to={url}>{title}</Link>,
@@ -89,7 +122,7 @@ const MainLayout = () => {
   const navigate = useNavigate();
   const { pathname } = location;
   
-  // Find which menu keys should be open
+  // 获取应该打开的菜单项
   const getOpenKeys = () => {
     const segments = pathname.split('/').filter(Boolean);
     if (segments.length > 0) {
@@ -98,43 +131,43 @@ const MainLayout = () => {
     return [];
   };
   
-  // Find the selected key (current page)
+  // 获取当前选中的菜单项
   const getSelectedKey = () => {
-    // For most pages, the pathname is the key
-    // For dynamic routes, we need to handle special cases
-    if (pathname.match(/^\/templates\/edit\/\d+$/)) {
-      return '/templates/edit';
-    } else if (pathname.match(/^\/templates\/detail\/\d+$/)) {
-      return '/templates/detail';
-    } else if (pathname.match(/^\/templates\/script\/\d+$/)) {
-      return '/templates/script';
-    } else if (pathname.match(/^\/rss-manager\/feeds\/detail\/\d+$/)) {
-      return '/rss-manager/feeds/detail';
-    } else {
-      return pathname;
+    // 处理动态路由，返回父路由
+    if (pathname.match(/^\/rss-manager\/feeds\/detail\/\d+$/)) {
+      return '/rss-manager/feeds';
     }
+    
+    return pathname;
   };
   
-  // Handle menu click
+  // 菜单点击处理
   const handleMenuClick = ({ key }) => {
     navigate(key);
   };
 
-  // Handle logout
+  // 退出登录
   const handleLogout = () => {
-    // Clear user data from local storage
     localStorage.removeItem('token');
-    // Redirect to login page
     navigate('/auth/login');
   };
 
-  // User menu items
+  // 用户菜单项
   const userMenuItems = [
     {
       key: 'profile',
       icon: <UserOutlined />,
       label: '个人设置',
       onClick: () => navigate('/user/profile')
+    },
+    {
+      key: 'settings',
+      icon: <SettingOutlined />,
+      label: '系统设置',
+      onClick: () => navigate('/system/settings')
+    },
+    {
+      type: 'divider'
     },
     {
       key: 'logout',
@@ -144,7 +177,7 @@ const MainLayout = () => {
     }
   ];
 
-  // Generate breadcrumb items
+  // 生成面包屑导航
   const breadcrumbItems = generateBreadcrumb(pathname);
 
   return (
@@ -161,94 +194,141 @@ const MainLayout = () => {
           top: 0,
           bottom: 0,
           zIndex: 1000,
+          boxShadow: '2px 0 8px rgba(0,0,0,0.06)',
         }}
-        theme="dark"
+        theme="light"
         width={260}
       >
-        <div className="logo" style={{ 
+        <div style={{ 
           height: 64, 
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center',
-          color: token.colorPrimary,
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+          borderBottom: '1px solid #f0f0f0',
+          padding: '0 16px'
         }}>
-          <h2 style={{ 
-            color: token.colorPrimary, 
-            margin: 0, 
-            fontSize: collapsed ? '16px' : '20px',
-            fontWeight: 'bold',
-            letterSpacing: '1px'
-          }}>
-            {collapsed ? 'PF' : 'ParaluxFlow'}
-          </h2>
+          <Link to="/" style={{ display: 'flex', alignItems: 'center' }}>
+            <AppstoreOutlined style={{ 
+              fontSize: 24, 
+              color: token.colorPrimary,
+              marginRight: collapsed ? 0 : 12
+            }} />
+            {!collapsed && (
+              <Text style={{ 
+                fontSize: 18, 
+                fontWeight: 'bold',
+                color: token.colorPrimary,
+                margin: 0
+              }}>
+                ParaluxFlow
+              </Text>
+            )}
+          </Link>
         </div>
+        
         <Menu
-          theme="dark"
+          theme="light"
           mode="inline"
           defaultOpenKeys={getOpenKeys()}
           selectedKeys={[getSelectedKey()]}
           items={menuItems}
           onClick={handleMenuClick}
-          style={{ borderRight: 0 }}
+          style={{ 
+            borderRight: 0,
+            padding: '12px 0'
+          }}
         />
+        
+        <div style={{ 
+          position: 'absolute', 
+          bottom: 0, 
+          width: '100%', 
+          padding: '16px',
+          borderTop: '1px solid #f0f0f0',
+          textAlign: 'center'
+        }}>
+          <Text type="secondary" style={{ fontSize: '12px' }}>
+            {collapsed ? 'v1.0' : 'ParaluxFlow v1.0'}
+          </Text>
+        </div>
       </Sider>
-      <Layout style={{ marginLeft: collapsed ? 80 : 260, transition: 'margin-left 0.2s' }}>
+      
+      <Layout style={{ 
+        marginLeft: collapsed ? 80 : 260, 
+        transition: 'margin-left 0.2s'
+      }}>
         <Header
           style={{
-            padding: 0,
+            padding: '0 24px',
             background: token.colorBgContainer,
             position: 'sticky',
             top: 0,
             zIndex: 999,
-            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.03)',
+            boxShadow: '0 1px 4px rgba(0, 0, 0, 0.05)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            height: 64,
           }}
         >
-          <Button
-            type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
-            style={{
-              fontSize: '16px',
-              width: 64,
-              height: 64,
-            }}
-          />
-          <div style={{ paddingRight: 24, display: 'flex', alignItems: 'center' }}>
-            <Button 
-              type="text" 
-              icon={<AlertOutlined />} 
-              style={{ marginRight: 16 }}
-              onClick={() => navigate('/system/logs-alerts')}
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+              style={{
+                fontSize: '16px',
+                marginRight: 24
+              }}
             />
-            <Button 
-              type="text" 
-              icon={<SettingOutlined />} 
-              style={{ marginRight: 16 }}
-              onClick={() => navigate('/system')}
-            />
-            <Dropdown 
-              menu={{ items: userMenuItems }} 
-              placement="bottomRight"
-              trigger={['click']}
-            >
-              <Avatar style={{ cursor: 'pointer' }} icon={<UserOutlined />} />
-            </Dropdown>
+            <Breadcrumb items={breadcrumbItems} />
+          </div>
+          
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Space size={16}>
+              <Tooltip title="通知中心">
+                <Badge count={0} size="small">
+                  <Button type="text" icon={<BellOutlined />} shape="circle" />
+                </Badge>
+              </Tooltip>
+              
+              <Tooltip title="系统设置">
+                <Button 
+                  type="text" 
+                  icon={<SettingOutlined />} 
+                  shape="circle"
+                  onClick={() => navigate('/system')}
+                />
+              </Tooltip>
+              
+              <Divider type="vertical" style={{ height: 20, margin: '0 4px' }} />
+              
+              <Dropdown 
+                menu={{ items: userMenuItems }} 
+                placement="bottomRight"
+                trigger={['click']}
+              >
+                <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                  <Avatar 
+                    style={{ 
+                      marginRight: 8,
+                      backgroundColor: token.colorPrimary 
+                    }} 
+                    icon={<UserOutlined />} 
+                  />
+                  <Text style={{ marginRight: 4 }}>管理员</Text>
+                </div>
+              </Dropdown>
+            </Space>
           </div>
         </Header>
-        <div style={{ padding: '16px 16px 0', background: token.colorBgContainer }}>
-          <Breadcrumb items={breadcrumbItems} />
-        </div>
+        
         <Content
           style={{
             margin: '16px',
-            padding: 24,
-            background: token.colorBgContainer,
-            borderRadius: 4,
             minHeight: 280,
+            borderRadius: 8,
+            overflow: 'hidden',
           }}
         >
           <Outlet />

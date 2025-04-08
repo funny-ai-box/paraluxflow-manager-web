@@ -1,8 +1,34 @@
 import { fetchRssFeeds, updateFeedStatus } from '@/services/rss';
 import { useEffect, useState } from 'react';
-import { Table, Input, Select, Switch, Button, Space, Card, Typography, Image, Tooltip, message, Form } from 'antd';
-import { SearchOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { 
+  Table, 
+  Input, 
+  Select, 
+  Switch, 
+  Button, 
+  Space, 
+  Card, 
+  Typography, 
+  Image, 
+  Tooltip, 
+  message, 
+  Form,
+  Tag,
+  Avatar,
+  Divider,
+  Badge
+} from 'antd';
+import { 
+  SearchOutlined, 
+  SyncOutlined, 
+  LinkOutlined,
+  EyeOutlined, 
+  CheckCircleFilled,
+  CloseCircleFilled,
+  QuestionCircleFilled
+} from '@ant-design/icons';
 import CreateNewFeed from './components/CreateNewFeed';
+import { Link } from 'react-router-dom';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -120,97 +146,92 @@ const Feeds = () => {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
-      width: 100,
-      render: truncateId, // 使用截断函数显示ID
-    },
-    {
-      title: 'Logo',
-      dataIndex: 'logo',
-      key: 'logo',
       width: 80,
-      render: (logo) => logo ? <Image src={logo} alt="Logo" width={40} height={40} preview={false} /> : null
+      render: truncateId,
     },
     {
-      title: '标题',
+      title: '订阅源信息',
       dataIndex: 'title',
       key: 'title',
-      width: 180,
-      ellipsis: true, // 启用省略
-      render: (text) => (
-        <Tooltip title={text}>
-          <span>{text}</span>
-        </Tooltip>
-      )
-    },
-    {
-      title: '描述',
-      dataIndex: 'description',
-      key: 'description',
-      width: 180,
-      ellipsis: true,
-      render: (text) => (
-        <Tooltip title={text}>
-          <div style={{ maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {text}
+      width: 300,
+      render: (text, record) => (
+        <Space>
+          <Avatar 
+            src={record.logo} 
+            alt={text}
+            shape="square" 
+            size={40}
+            style={{ backgroundColor: '#f0f0f0' }}
+          >
+            {text.charAt(0).toUpperCase()}
+          </Avatar>
+          <div>
+            <Text strong style={{ fontSize: '14px' }}>{text}</Text>
+            <div>
+              <Text type="secondary" ellipsis style={{ fontSize: '12px' }}>
+                {record.description || '暂无描述'}
+              </Text>
+            </div>
           </div>
-        </Tooltip>
+        </Space>
       )
     },
     {
       title: '链接',
       dataIndex: 'url',
       key: 'url',
-      width: 200,
+      width: 250,
       ellipsis: true,
       render: (url) => url ? (
         <Tooltip title={url}>
-          <a href={url} target="_blank" rel="noopener noreferrer">
-            {url.length > 25 ? `${url.substring(0, 25)}...` : url}
+          <a href={url} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center' }}>
+            <LinkOutlined style={{ marginRight: 6 }} />
+            <span>{url.length > 30 ? `${url.substring(0, 30)}...` : url}</span>
           </a>
         </Tooltip>
-      ) : 'N/A'
+      ) : '无链接'
     },
     {
       title: '分类',
       dataIndex: 'category',
       key: 'category',
-      width: 100,
-      render: (_, record) => record.category ? record.category.name : '-'
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'created_at',
-      key: 'created_at',
-      width: 150,
+      width: 120,
+      render: (_, record) => record.category ? (
+        <Tag color="blue">{record.category.name}</Tag>
+      ) : <Tag color="default">未分类</Tag>
     },
     {
       title: '最后抓取',
       dataIndex: 'last_fetch_at',
       key: 'last_fetch_at',
-      width: 150,
+      width: 170,
+      render: (text, record) => (
+        <Space direction="vertical" size={0}>
+          <Text>{text || '从未抓取'}</Text>
+          <Text>
+            {record.last_fetch_status === 1 ? (
+              <Badge status="success" text="成功" />
+            ) : record.last_fetch_status === 2 ? (
+              <Badge status="error" text="失败" />
+            ) : (
+              <Badge status="default" text="未知" />
+            )}
+          </Text>
+        </Space>
+      )
     },
     {
       title: '状态',
-      dataIndex: 'last_fetch_status',
-      key: 'last_fetch_status',
-      width: 80,
-      render: (status) => {
-        if (status === 1) return <Text type="success">成功</Text>;
-        if (status === 2) return <Text type="danger">失败</Text>;
-        return <Text type="warning">未知</Text>;
-      }
-    },
-    {
-      title: '启用',
       dataIndex: 'is_active',
       key: 'is_active',
-      width: 80,
+      width: 100,
       render: (active, record) => (
         <Switch
-          checked={active}
+          checked={!!active}
           onChange={(checked) => handleChangeFeedStatus(checked, record)}
           loading={loading}
-          size="small"
+          checkedChildren="启用"
+          unCheckedChildren="禁用"
         />
       ),
     },
@@ -218,29 +239,26 @@ const Feeds = () => {
       title: '操作',
       key: 'action',
       width: 100,
-      fixed: 'right', // 固定在右侧
+      fixed: 'right',
       render: (_, record) => (
-        <a
-          key="view"
-          target="_blank"
-          href={`/rss-manager/feeds/detail/${record.id}`}
-          rel="noreferrer"
-        >
-          查看详情
-        </a>
+        <Link to={`/rss-manager/feeds/detail/${record.id}`}>
+          <Button type="primary" size="small" icon={<EyeOutlined />}>
+            查看
+          </Button>
+        </Link>
       ),
     },
   ];
 
   return (
     <div style={{ padding: '24px' }}>
-      <Card>
-        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+      <Card
+        title={
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Title level={4}>RSS 订阅源</Title>
+            <Title level={4} style={{ margin: 0 }}>RSS 订阅源</Title>
             <Space>
               <Button 
-                icon={<ReloadOutlined />} 
+                icon={<SyncOutlined />} 
                 onClick={() => loadFeeds()}
                 loading={loading}
               >
@@ -249,48 +267,71 @@ const Feeds = () => {
               <CreateNewFeed key="create" />
             </Space>
           </div>
-          
-          <Card>
-            <Form 
-              form={searchForm}
-              layout="inline"
-              onFinish={handleSearch}
-              style={{ marginBottom: 24 }}
-            >
-              <Form.Item name="title" label="标题">
-                <Input placeholder="请输入标题" allowClear />
-              </Form.Item>
-              <Form.Item name="url" label="链接">
-                <Input placeholder="请输入链接" allowClear />
-              </Form.Item>
-              <Form.Item name="is_active" label="状态">
-                <Select placeholder="请选择状态" allowClear style={{ width: 120 }}>
-                  <Option value={1}>启用</Option>
-                  <Option value={0}>禁用</Option>
-                </Select>
-              </Form.Item>
-              <Form.Item>
-                <Space>
-                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-                    搜索
-                  </Button>
-                  <Button onClick={handleReset}>重置</Button>
-                </Space>
-              </Form.Item>
-            </Form>
-          </Card>
-          
-          <Table
-            columns={columns}
-            dataSource={feeds}
-            rowKey="id"
-            loading={loading}
-            pagination={pagination}
-            onChange={handleTableChange}
-            scroll={{ x: 1300 }}
-            size="middle" // 使用更紧凑的表格布局
-          />
-        </Space>
+        }
+        bordered={false}
+        style={{ borderRadius: '8px', marginBottom: '16px' }}
+      >
+        <Card
+          style={{ borderRadius: '8px', marginBottom: '16px' }}
+          size="small"
+        >
+          <Form 
+            form={searchForm}
+            layout="inline"
+            onFinish={handleSearch}
+          >
+            <Form.Item name="title" label="标题">
+              <Input 
+                placeholder="请输入标题"
+                allowClear
+                style={{ width: 180 }}
+                prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
+              />
+            </Form.Item>
+            <Form.Item name="url" label="链接">
+              <Input 
+                placeholder="请输入链接" 
+                allowClear
+                style={{ width: 180 }}
+                prefix={<LinkOutlined style={{ color: '#bfbfbf' }} />}
+              />
+            </Form.Item>
+            <Form.Item name="is_active" label="状态">
+              <Select 
+                placeholder="请选择状态" 
+                allowClear 
+                style={{ width: 120 }}
+              >
+                <Option value={1}>启用</Option>
+                <Option value={0}>禁用</Option>
+              </Select>
+            </Form.Item>
+            <Form.Item>
+              <Space>
+                <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                  搜索
+                </Button>
+                <Button onClick={handleReset}>重置</Button>
+              </Space>
+            </Form.Item>
+          </Form>
+        </Card>
+        
+        <Table
+          columns={columns}
+          dataSource={feeds}
+          rowKey="id"
+          loading={loading}
+          pagination={pagination}
+          onChange={handleTableChange}
+          scroll={{ x: 1100 }}
+          size="middle"
+          bordered
+        />
+        
+        <div style={{ marginTop: 16, textAlign: 'center' }}>
+          <Text type="secondary">共 {pagination.total} 个订阅源</Text>
+        </div>
       </Card>
     </div>
   );

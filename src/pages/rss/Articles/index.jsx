@@ -8,22 +8,47 @@ import {
   message, 
   Image, 
   Tooltip, 
-  Space 
+  Space,
+  Card,
+  Typography,
+  Divider,
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  Badge,
+  Empty,
+  Tabs
 } from 'antd';
-import { SyncOutlined, EyeOutlined, ReloadOutlined } from '@ant-design/icons';
+import { 
+  SyncOutlined, 
+  EyeOutlined, 
+  ReloadOutlined, 
+  SearchOutlined,
+  FileTextOutlined,
+  CalendarOutlined,
+  LinkOutlined,
+  FilterOutlined,
+  ClearOutlined
+} from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
+import dayjs from 'dayjs';
 
 import { fetchArticleDetail, fetchArticleList, resetArticle } from '@/services/article';
+import HtmlContentViewer from '@/components/HtmlContentViewer';
 
-import HtmlContentViewer from '../Feeds/components/HtmlContentViewer';
+const { Title, Text } = Typography;
+const { RangePicker } = DatePicker;
+const { Option } = Select;
+const { TabPane } = Tabs;
 
 const ArticleTable = () => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [currentArticle, setCurrentArticle] = useState({});
   const [articleContent, setArticleContent] = useState({ html_content: '', text_content: '' });
   const [loading, setLoading] = useState(false);
-
-
+  const [searchForm] = Form.useForm();
+  const [activeTabKey, setActiveTabKey] = useState('html');
 
   const handleResetArticle = async (record) => {
     try {
@@ -76,18 +101,19 @@ const ArticleTable = () => {
   const StatusTag = ({ status, errorMessage }) => {
     const statusMap = {
       0: { color: 'orange', text: '待处理' },
-      1: { color: 'green', text: '成功' },
-      2: { color: 'red', text: '失败' },
+      1: { color: 'success', text: '成功' },
+      2: { color: 'error', text: '失败' },
     };
-    
-    const { color, text } = statusMap[status] || { color: 'default', text: 'Unknown' };
     
     return (
       <Space>
-        <Tag color={color}>{text}</Tag>
+        <Badge 
+          status={statusMap[status]?.color || 'default'} 
+          text={statusMap[status]?.text || '未知'}
+        />
         {status === 2 && errorMessage && (
           <Tooltip title={errorMessage}>
-            <Tag color="red">错误</Tag>
+            <Tag color="red">错误详情</Tag>
           </Tooltip>
         )}
       </Space>
@@ -96,57 +122,82 @@ const ArticleTable = () => {
 
   const columns = [
     {
-      title: 'ID',
-      dataIndex: 'id',
-      width: 80,
+      title: '文章信息',
+      key: 'info',
+      width: 400,
+      render: (_, record) => (
+        <Space align="start">
+          {record.thumbnail_url && (
+            <Image
+              src={record.thumbnail_url}
+              alt="缩略图"
+              width={100}
+              height={60}
+              style={{
+                objectFit: 'cover',
+                borderRadius: 4,
+                border: '1px solid #f0f0f0'
+              }}
+              fallback="/default-thumbnail.png"
+            />
+          )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <Text 
+              strong 
+              ellipsis={{ tooltip: record.title }} 
+              style={{ maxWidth: 250 }}
+            >
+              {record.title}
+            </Text>
+            
+            <Text 
+              type="secondary" 
+              ellipsis={{ tooltip: record.summary }}
+              style={{ fontSize: 12, maxWidth: 250 }}
+            >
+              {record.summary || '暂无摘要'}
+            </Text>
+            
+            <Space>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                <LinkOutlined style={{ marginRight: 4 }} />
+                {record.feed_title || '未知来源'}
+              </Text>
+              
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                <CalendarOutlined style={{ marginRight: 4 }} />
+                {record.published_date ? dayjs(record.published_date).format('YYYY-MM-DD') : '未知时间'}
+              </Text>
+            </Space>
+          </div>
+        </Space>
+      ),
       search: false,
     },
     {
-      title: '缩略图',
-      dataIndex: 'thumbnail_url',
-      width: 120,
-      search: false,
-      render: (url) => url ? (
-        <Image
-          src={url}
-          alt="缩略图"
-          width={100}
-          height={60}
-          fallback="/default-thumbnail.png"
-          style={{ objectFit: 'cover' }}
-        />
-      ) : null,
-    },
-    {
-      title: '标题',
-      dataIndex: 'title',
-      width: 250,
-      ellipsis: true,
-      search: true,
-    },
-    {
-      title: '订阅源',
+      title: '来源',
       dataIndex: 'feed_title',
       width: 150,
       ellipsis: true,
       search: true,
     },
     {
-      title: '摘要',
-      dataIndex: 'summary',
-      width: 300,
-      ellipsis: true,
-      search: false,
-    },
-    {
       title: '链接',
       dataIndex: 'link',
       width: 100,
       ellipsis: true,
-      search: false,
       render: (text) => text ? (
-        text
+        <Button 
+          type="link" 
+          size="small" 
+          href={text} 
+          target="_blank" 
+          icon={<LinkOutlined />}
+        >
+          原文
+        </Button>
       ) : null,
+      search: false,
     },
     {
       title: '状态',
@@ -163,173 +214,267 @@ const ArticleTable = () => {
           errorMessage={record.error_message} 
         />
       ),
+      filters: [
+        { text: '待处理', value: 0 },
+        { text: '成功', value: 1 },
+        { text: '失败', value: 2 },
+      ],
     },
     {
       title: '发布时间',
       dataIndex: 'published_date',
-      valueType: 'dateTime',
-      width: 180,
-      sorter: true,
-      search: false,
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'created_at',
-      valueType: 'dateTime',
-      width: 180,
+      valueType: 'date',
+      width: 120,
       sorter: true,
       search: false,
     },
     {
       title: '操作',
       valueType: 'option',
-      width: 180,
+      width: 160,
       render: (_, record) => [
-       
         record.status === 2 && (
           <Button
             key="reset"
-            type="default"
+            type="primary"
             size="small"
             danger
             icon={<ReloadOutlined />}
             onClick={() => handleResetArticle(record)}
             style={{ marginRight: 8 }}
           >
-            Reset
+            重置
           </Button>
         ),
         record.status === 1 && (
           <Button
             key="view"
-            type="link"
+            type="primary"
             size="small"
             icon={<EyeOutlined />}
             onClick={() => handleViewContent(record)}
           >
-            View
+            查看
           </Button>
         ),
       ],
     },
   ];
+  
+  // 自定义搜索表单
+  const renderSearchForm = () => (
+    <Card 
+      bordered={false} 
+      style={{ marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
+      bodyStyle={{ padding: '16px 24px' }}
+    >
+      <Form
+        form={searchForm}
+        layout="horizontal"
+        onFinish={(values) => {
+          // 这里可以处理搜索表单提交
+          console.log('搜索条件:', values);
+        }}
+      >
+        <Row gutter={24}>
+          <Col span={6}>
+            <Form.Item name="title" label="标题">
+              <Input placeholder="请输入文章标题" allowClear />
+            </Form.Item>
+          </Col>
+          <Col span={6}>
+            <Form.Item name="feed_title" label="来源">
+              <Input placeholder="请输入来源" allowClear />
+            </Form.Item>
+          </Col>
+          <Col span={6}>
+            <Form.Item name="status" label="状态">
+              <Select placeholder="请选择状态" allowClear>
+                <Option value={0}>待处理</Option>
+                <Option value={1}>成功</Option>
+                <Option value={2}>失败</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={6}>
+            <Form.Item name="date_range" label="时间范围">
+              <RangePicker style={{ width: '100%' }} />
+            </Form.Item>
+          </Col>
+          <Col span={24} style={{ textAlign: 'right' }}>
+            <Form.Item>
+              <Space>
+                <Button htmlType="button" onClick={() => searchForm.resetFields()}>
+                  清空
+                </Button>
+                <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                  搜索
+                </Button>
+              </Space>
+            </Form.Item>
+          </Col>
+        </Row>
+      </Form>
+    </Card>
+  );
 
   return (
-    <div style={{ width: '100%', overflow: 'hidden' }}>
-      <ProTable
-        columns={columns}
-        request={async (params, sort, filter) => {
-          // Format params for the API
-          const { current, pageSize, ...restParams } = params;
-          
-          // Convert ProTable params to API params
-          const apiParams = {
-            page: current,
-            per_page: pageSize,
-            ...restParams,
-          };
-          
-          try {
-            const response = await fetchArticleList(apiParams);
+    <div style={{ padding: 16 }}>
+      <Card
+        bordered={false}
+        style={{ marginBottom: 16, borderRadius: 8 }}
+        title={
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Title level={4} style={{ margin: 0 }}>文章管理</Title>
+            <Space>
+              <Button
+                icon={<FilterOutlined />}
+              >
+                筛选
+              </Button>
+              <Button
+                type="primary"
+                icon={<ReloadOutlined />}
+              >
+                刷新
+              </Button>
+            </Space>
+          </div>
+        }
+      >
+        {renderSearchForm()}
+        
+        <ProTable
+          columns={columns}
+          request={async (params, sort, filter) => {
+            // 转换参数格式
+            const { current, pageSize, ...restParams } = params;
             
-            if (response.code === 200) {
-              return {
-                data: response.data.list,
-                success: true,
-                total: response.data.total,
-              };
-            } else {
-              message.error(response.message || '获取文章列表失败');
+            // 转换为API参数
+            const apiParams = {
+              page: current,
+              per_page: pageSize,
+              ...restParams,
+            };
+            
+            try {
+              const response = await fetchArticleList(apiParams);
+              
+              if (response.code === 200) {
+                return {
+                  data: response.data.list,
+                  success: true,
+                  total: response.data.total,
+                };
+              } else {
+                message.error(response.message || '获取文章列表失败');
+                return {
+                  data: [],
+                  success: false,
+                };
+              }
+            } catch (error) {
+              console.error('Error fetching articles:', error);
+              message.error('获取文章列表时发生错误');
               return {
                 data: [],
                 success: false,
               };
             }
-          } catch (error) {
-            console.error('Error fetching articles:', error);
-            message.error('获取文章列表时发生错误');
-            return {
-              data: [],
-              success: false,
-            };
-          }
-        }}
-        rowKey="id"
-        pagination={{
-          showQuickJumper: true,
-          showSizeChanger: true,
-        }}
-        search={{
-          labelWidth: 'auto',
-          defaultCollapsed: false,
-        }}
-        dateFormatter="string"
-        headerTitle="文章列表"
-        toolbar={{
-          actions: [
-            <Button 
-              key="refresh" 
-              type="primary"
-              icon={<ReloadOutlined />}
-              onClick={() => {
-                // Refresh the table
-                const actionRef = ProTable.useActionRef();
-                if (actionRef.current) {
-                  actionRef.current.reload();
-                }
-              }}
-            >
-              Refresh
-            </Button>
-          ],
-        }}
-        scroll={{ x: 'max-content' }}
-      />
+          }}
+          rowKey="id"
+          pagination={{
+            showQuickJumper: true,
+            showSizeChanger: true,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            showTotal: (total) => `共 ${total} 条记录`,
+          }}
+          search={false}
+          dateFormatter="string"
+          headerTitle={null}
+          options={false}
+          cardProps={{
+            bodyStyle: { padding: 0 },
+          }}
+          scroll={{ x: 'max-content' }}
+        />
+      </Card>
       
       <Drawer
-        title={currentArticle?.title}
+        title={
+          <div>
+            <Text strong style={{ fontSize: 16 }}>{currentArticle?.title}</Text>
+            <div>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                {currentArticle?.feed_title} · {currentArticle?.published_date}
+              </Text>
+            </div>
+          </div>
+        }
         width={1200}
         onClose={closeDrawer}
         open={drawerVisible}
-        bodyStyle={{ paddingBottom: 80 }}
+        bodyStyle={{ padding: 0 }}
+        destroyOnClose
       >
-        <Row gutter={16}>
-          <Col span={12}>
-            <h3>HTML 内容</h3>
-            {loading ? (
-              <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                <SyncOutlined spin style={{ fontSize: 24 }} />
-                <p>正在加载内容...</p>
-              </div>
-            ) : (
+        <Tabs 
+          activeKey={activeTabKey} 
+          onChange={setActiveTabKey}
+          style={{ padding: '0 24px' }}
+          tabBarStyle={{ marginBottom: 0 }}
+        >
+          <TabPane 
+            tab={
+              <Space>
+                <FileTextOutlined />
+                <span>HTML内容</span>
+              </Space>
+            } 
+            key="html"
+          />
+          <TabPane 
+            tab={
+              <Space>
+                <FileTextOutlined />
+                <span>纯文本</span>
+              </Space>
+            } 
+            key="text"
+          />
+        </Tabs>
+        
+        <Divider style={{ margin: '0 0 16px 0' }} />
+        
+        <div style={{ padding: '0 24px 24px' }}>
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '40px 0' }}>
+              <SyncOutlined spin style={{ fontSize: 24 }} />
+              <p>正在加载内容...</p>
+            </div>
+          ) : activeTabKey === 'html' ? (
+            articleContent.html_content ? (
               <HtmlContentViewer htmlContent={articleContent.html_content} />
-            )}
-          </Col>
-          <Col span={12}>
-            <h3>文本内容</h3>
+            ) : (
+              <Empty description="暂无HTML内容" />
+            )
+          ) : (
             <div
               style={{
                 maxWidth: '100%',
                 overflowY: 'auto',
-                height: 'calc(100vh - 200px)',
+                height: 'calc(100vh - 250px)',
                 boxSizing: 'border-box',
                 padding: '16px',
                 border: '1px solid #f0f0f0',
-                borderRadius: '4px',
+                borderRadius: '8px',
+                background: '#fafafa',
                 whiteSpace: 'pre-wrap',
               }}
             >
-              {loading ? (
-                <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                  <SyncOutlined spin style={{ fontSize: 24 }} />
-                  <p>正在加载内容...</p>
-                </div>
-              ) : (
-                articleContent.text_content || '暂无文本内容'
-              )}
+              {articleContent.text_content || <Empty description="暂无文本内容" />}
             </div>
-          </Col>
-        </Row>
+          )}
+        </div>
       </Drawer>
     </div>
   );
