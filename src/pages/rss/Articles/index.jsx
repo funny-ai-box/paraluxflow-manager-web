@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Button,
   Col, 
@@ -49,12 +49,17 @@ const ArticleTable = () => {
   const [loading, setLoading] = useState(false);
   const [searchForm] = Form.useForm();
   const [activeTabKey, setActiveTabKey] = useState('html');
+  const [searchParams, setSearchParams] = useState({});
+  const actionRef = useRef();
 
   const handleResetArticle = async (record) => {
     try {
       const result = await resetArticle(record.id);
       if (result.code === 200) {
         message.success('文章重置成功');
+        if (actionRef.current) {
+          actionRef.current.reload();
+        }
         return true;
       } else {
         message.error(result.message || '文章重置失败');
@@ -272,8 +277,21 @@ const ArticleTable = () => {
         form={searchForm}
         layout="horizontal"
         onFinish={(values) => {
-          // 这里可以处理搜索表单提交
-          console.log('搜索条件:', values);
+          // 处理日期范围
+          const params = { ...values };
+          if (values.date_range) {
+            params.start_date = values.date_range[0].format('YYYY-MM-DD');
+            params.end_date = values.date_range[1].format('YYYY-MM-DD');
+            delete params.date_range;
+          }
+          
+          // 更新搜索参数
+          setSearchParams(params);
+          
+          // 重新加载表格数据
+          if (actionRef.current) {
+            actionRef.current.reload();
+          }
         }}
       >
         <Row gutter={24}>
@@ -304,7 +322,17 @@ const ArticleTable = () => {
           <Col span={24} style={{ textAlign: 'right' }}>
             <Form.Item>
               <Space>
-                <Button htmlType="button" onClick={() => searchForm.resetFields()}>
+                <Button 
+                  htmlType="button" 
+                  onClick={() => {
+                    searchForm.resetFields();
+                    setSearchParams({});
+                    if (actionRef.current) {
+                      actionRef.current.reload();
+                    }
+                  }}
+                  icon={<ClearOutlined />}
+                >
                   清空
                 </Button>
                 <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
@@ -317,6 +345,13 @@ const ArticleTable = () => {
       </Form>
     </Card>
   );
+
+  // 刷新表格数据
+  const handleRefresh = () => {
+    if (actionRef.current) {
+      actionRef.current.reload();
+    }
+  };
 
   return (
     <div style={{ padding: 16 }}>
@@ -335,6 +370,7 @@ const ArticleTable = () => {
               <Button
                 type="primary"
                 icon={<ReloadOutlined />}
+                onClick={handleRefresh}
               >
                 刷新
               </Button>
@@ -345,15 +381,17 @@ const ArticleTable = () => {
         {renderSearchForm()}
         
         <ProTable
+          actionRef={actionRef}
           columns={columns}
           request={async (params, sort, filter) => {
             // 转换参数格式
             const { current, pageSize, ...restParams } = params;
             
-            // 转换为API参数
+            // 合并搜索表单参数和表格请求参数
             const apiParams = {
               page: current,
               per_page: pageSize,
+              ...searchParams,  // 添加搜索表单的参数
               ...restParams,
             };
             

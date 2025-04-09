@@ -12,6 +12,9 @@ import NotFoundPage from './pages/404';
 import Feeds from './pages/rss/Feeds';
 import FeedDetail from './pages/rss/Feeds/Detail';
 import Articles from './pages/rss/Articles';
+import SyncLogs from './pages/rss/SyncLogs';
+import SyncLogDetail from './pages/rss/SyncLogs/Detail';
+import SyncAnalysis from './pages/rss/SyncAnalysis';
 
 
 // LLM Pages (new)
@@ -61,6 +64,22 @@ const router = createBrowserRouter([
       {
         path: '/rss-manager/articles',
         element: <Articles />,
+      },
+      {
+        path: '/rss-manager/articles',
+        element: <Articles />,
+      },
+      {
+        path: '/rss-manager/sync-logs',
+        element: <SyncLogs />,
+      },
+      {
+        path: '/rss-manager/sync-logs/detail/:id',
+        element: <SyncLogDetail />,
+      },
+      {
+        path: '/rss-manager/sync-analysis',
+        element: <SyncAnalysis />,
       },
 
       

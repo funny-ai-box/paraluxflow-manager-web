@@ -234,8 +234,7 @@ const Register = () => {
         alignItems: 'center', 
         padding: '50px 0' 
       }}>
-        <Row justify="center" align="middle">
-          <Col xs={22} sm={16} md={12} lg={8} xl={6}>
+        <Row justify="center" align="middle" style={{ width: '500px' }}>
             <Card 
               style={{ 
                 width: '100%', 
@@ -287,7 +286,7 @@ const Register = () => {
                 </Text>
               </div>
             </Card>
-          </Col>
+    
         </Row>
       </Content>
     </Layout>

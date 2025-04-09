@@ -1,4 +1,7 @@
-import { fetchRssFeeds, updateFeedStatus } from '@/services/rss';
+import {
+  fetchRssFeeds, updateFeedStatus
+} from '@/services/rss';
+import { batchSyncFeedArticles } from '@/services/sync';
 import { useEffect, useState } from 'react';
 import { 
   Table, 
@@ -16,7 +19,8 @@ import {
   Tag,
   Avatar,
   Divider,
-  Badge
+  Badge,
+  Modal
 } from 'antd';
 import { 
   SearchOutlined, 
@@ -43,6 +47,39 @@ const Feeds = () => {
     showQuickJumper: true,
   });
   const [searchForm] = Form.useForm();
+  
+  // 添加批量同步功能
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [syncLoading, setSyncLoading] = useState(false);
+
+  const handleBatchSync = () => {
+    if (selectedRowKeys.length === 0) {
+      message.warning('请选择需要同步的订阅源');
+      return;
+    }
+
+    Modal.confirm({
+      title: '批量同步确认',
+      content: `确定要同步选中的 ${selectedRowKeys.length} 个订阅源吗？`,
+      onOk: async () => {
+        setSyncLoading(true);
+        try {
+          const result = await batchSyncFeedArticles(selectedRowKeys);
+          if (result.code === 200) {
+            message.success(`批量同步任务已触发，共 ${selectedRowKeys.length} 个订阅源，同步ID: ${result.data.sync_id}`);
+            setSelectedRowKeys([]);
+          } else {
+            message.error(result.message || '批量同步订阅源文章失败');
+          }
+        } catch (error) {
+          console.error('批量同步订阅源文章时出错:', error);
+          message.error('批量同步订阅源文章时发生错误');
+        } finally {
+          setSyncLoading(false);
+        }
+      }
+    });
+  };
   
   const loadFeeds = async (params = {}) => {
     setLoading(true);
@@ -139,6 +176,28 @@ const Feeds = () => {
       );
     }
     return id;
+  };
+
+  // 行选择配置
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (newSelectedRowKeys) => {
+      setSelectedRowKeys(newSelectedRowKeys);
+    },
+    selections: [
+      Table.SELECTION_ALL,
+      Table.SELECTION_NONE,
+      {
+        key: 'active',
+        text: '选择所有已启用',
+        onSelect: () => {
+          const activeKeys = feeds
+            .filter(feed => feed.is_active)
+            .map(feed => feed.id);
+          setSelectedRowKeys(activeKeys);
+        }
+      }
+    ]
   };
 
   const columns = [
@@ -264,6 +323,16 @@ const Feeds = () => {
               >
                 刷新
               </Button>
+              {selectedRowKeys.length > 0 && (
+                <Button 
+                  type="primary"
+                  icon={<SyncOutlined />}
+                  onClick={handleBatchSync}
+                  loading={syncLoading}
+                >
+                  批量同步 ({selectedRowKeys.length})
+                </Button>
+              )}
               <CreateNewFeed key="create" />
             </Space>
           </div>
@@ -327,6 +396,7 @@ const Feeds = () => {
           scroll={{ x: 1100 }}
           size="middle"
           bordered
+          rowSelection={rowSelection}
         />
         
         <div style={{ marginTop: 16, textAlign: 'center' }}>

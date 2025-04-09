@@ -36,10 +36,10 @@ import {
 
 import { 
   fetchRssFeedDetail, 
-  syncFeedArticles, 
-  fetchRssFeedArticles, 
   testFeedLinkCrawlerScript 
 } from '@/services/rss';
+import { fetchRssFeedArticles } from '@/services/rss';
+import { syncFeedArticles } from '@/services/sync';
 import { getContentFromUrl } from '@/services/article';
 import JsonViewer from '@/components/JsonViewer';
 import CodeEditorDrawer from '../../components/CodeEditorDrawer';
@@ -132,11 +132,14 @@ export default function FeedDetail() {
     try {
       const result = await syncFeedArticles(id);
       if (result.code === 200) {
-        message.success('订阅源文章同步成功');
-        fetchFeedArticles({
-          page: 1,
-          pageSize: tableParams.pageSize,
-        });
+        message.success('订阅源文章同步任务已触发');
+        // 短暂延迟后刷新文章列表
+        setTimeout(() => {
+          fetchFeedArticles({
+            page: 1,
+            pageSize: tableParams.pageSize,
+          });
+        }, 1000);
       } else {
         message.error(result.message || '同步订阅源文章失败');
       }
@@ -378,8 +381,8 @@ export default function FeedDetail() {
             
             <Divider style={{ margin: '16px 0' }} />
             
-            <Row gutter={16}>
-              <Col span={12}>
+       
+              
                 <Card 
                   size="small" 
                   title={
@@ -403,33 +406,8 @@ export default function FeedDetail() {
                     </Button>
                   )}
                 </Card>
-              </Col>
-              
-              <Col span={12}>
-                <Card 
-                  size="small" 
-                  title={
-                    <Space>
-                      <ExperimentOutlined />
-                      <span>测试与同步</span>
-                    </Space>
-                  }
-                  style={{ borderRadius: 4 }}
-                >
-                  <p>
-                    您可以测试抓取脚本或手动同步订阅源中的文章。
-                  </p>
-                  <Button 
-                    type="primary" 
-                    icon={<SyncOutlined />} 
-                    onClick={handleSyncArticles}
-                    loading={loading}
-                  >
-                    同步文章
-                  </Button>
-                </Card>
-              </Col>
-            </Row>
+            
+          
           </Col>
         </Row>
       </Card>

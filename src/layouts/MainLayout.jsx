@@ -11,7 +11,10 @@ import {
   RobotOutlined,
   LogoutOutlined,
   BellOutlined,
-  AppstoreOutlined
+  AppstoreOutlined,
+  HistoryOutlined,
+  LineChartOutlined,
+  SyncOutlined
 } from '@ant-design/icons';
 import { 
   Layout, 
@@ -51,6 +54,10 @@ const menuItems = [
         key: '/rss-manager/articles',
         label: '文章管理',
       },
+      {
+        key: '/rss-manager/sync-logs',
+        label: '同步日志',
+      },
     ],
   },
   {
@@ -77,6 +84,8 @@ const generateBreadcrumb = (pathname) => {
     '/rss-manager': 'RSS 管理',
     '/rss-manager/feeds': '订阅源管理',
     '/rss-manager/articles': '文章管理',
+    '/rss-manager/sync-logs': '同步日志',
+    '/rss-manager/sync-analysis': '同步分析',
     '/llm': 'LLM 管理',
     '/llm/providers': '提供商管理',
     '/llm/models': '模型管理',
@@ -88,6 +97,8 @@ const generateBreadcrumb = (pathname) => {
   let dynamicItemName = '';
   if (pathname.match(/^\/rss-manager\/feeds\/detail\/\d+$/)) {
     dynamicItemName = '订阅源详情';
+  } else if (pathname.match(/^\/rss-manager\/sync-logs\/detail\/[\w-]+$/)) {
+    dynamicItemName = '同步日志详情';
   }
   
   return [
