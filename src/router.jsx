@@ -17,11 +17,17 @@ import SyncLogDetail from './pages/rss/SyncLogs/Detail';
 import SyncAnalysis from './pages/rss/SyncAnalysis';
 
 
-// LLM Pages (new)
+// 新增爬取分析相关页面
+import CrawlerLogs from './pages/rss/CrawlerLogs';
+import CrawlerStats from './pages/rss/CrawlerStats';
+import CrawlerAnalysis from './pages/rss/CrawlerAnalysis';
+import CrawlerErrorAnalysis from './pages/rss/CrawlerErrorAnalysis';
+
+// LLM Pages
 import LlmProviders from './pages/llm/Providers';
 import LlmModels from './pages/llm/Models';
 
-// Auth Pages (new)
+// Auth Pages
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 
@@ -52,7 +58,7 @@ const router = createBrowserRouter([
         element: <Welcome />,
       },
       
-      // RSS Management
+      // RSS 订阅源管理
       {
         path: '/rss-manager/feeds',
         element: <Feeds />,
@@ -61,14 +67,14 @@ const router = createBrowserRouter([
         path: '/rss-manager/feeds/detail/:id',
         element: <FeedDetail />,
       },
+      
+      // 文章管理
       {
-        path: '/rss-manager/articles',
+        path: '/article-manager/list',
         element: <Articles />,
       },
-      {
-        path: '/rss-manager/articles',
-        element: <Articles />,
-      },
+      
+      // 同步管理
       {
         path: '/rss-manager/sync-logs',
         element: <SyncLogs />,
@@ -81,9 +87,26 @@ const router = createBrowserRouter([
         path: '/rss-manager/sync-analysis',
         element: <SyncAnalysis />,
       },
-
       
-      // LLM Providers (new)
+      // 爬取分析 - 新增
+      {
+        path: '/crawler-manager/logs',
+        element: <CrawlerLogs />,
+      },
+      {
+        path: '/crawler-manager/stats',
+        element: <CrawlerStats />,
+      },
+      {
+        path: '/crawler-manager/analysis',
+        element: <CrawlerAnalysis />,
+      },
+      {
+        path: '/crawler-manager/errors',
+        element: <CrawlerErrorAnalysis />,
+      },
+      
+      // LLM Providers
       {
         path: '/llm/providers',
         element: <LlmProviders />,

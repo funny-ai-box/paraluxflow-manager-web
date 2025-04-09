@@ -14,7 +14,12 @@ import {
   AppstoreOutlined,
   HistoryOutlined,
   LineChartOutlined,
-  SyncOutlined
+  SyncOutlined,
+  FileTextOutlined,
+  BugOutlined,
+  BarChartOutlined,
+  PieChartOutlined,
+  AreaChartOutlined
 } from '@ant-design/icons';
 import { 
   Layout, 
@@ -51,12 +56,46 @@ const menuItems = [
         label: '订阅源管理',
       },
       {
-        key: '/rss-manager/articles',
-        label: '文章管理',
-      },
-      {
         key: '/rss-manager/sync-logs',
         label: '同步日志',
+      },
+      {
+        key: '/rss-manager/sync-analysis',
+        label: '同步分析',
+      },
+    ],
+  },
+  {
+    key: 'article-manager',
+    icon: <FileTextOutlined />,
+    label: '文章管理',
+    children: [
+      {
+        key: '/article-manager/list',
+        label: '文章列表',
+      },
+    ],
+  },
+  {
+    key: 'crawler-manager',
+    icon: <BugOutlined />,
+    label: '爬取分析',
+    children: [
+      {
+        key: '/crawler-manager/logs',
+        label: '爬取日志',
+      },
+      {
+        key: '/crawler-manager/stats',
+        label: '统计数据',
+      },
+      {
+        key: '/crawler-manager/analysis',
+        label: '性能分析',
+      },
+      {
+        key: '/crawler-manager/errors',
+        label: '错误分析',
       },
     ],
   },
@@ -83,9 +122,21 @@ const generateBreadcrumb = (pathname) => {
     '/': '首页',
     '/rss-manager': 'RSS 管理',
     '/rss-manager/feeds': '订阅源管理',
-    '/rss-manager/articles': '文章管理',
     '/rss-manager/sync-logs': '同步日志',
+    '/rss-manager/sync-logs/detail': '同步日志详情',
     '/rss-manager/sync-analysis': '同步分析',
+    
+    // 新增文章管理相关
+    '/article-manager': '文章管理',
+    '/article-manager/list': '文章列表',
+    
+    // 新增爬取分析相关
+    '/crawler-manager': '爬取分析',
+    '/crawler-manager/logs': '爬取日志',
+    '/crawler-manager/stats': '统计数据',
+    '/crawler-manager/analysis': '性能分析',
+    '/crawler-manager/errors': '错误分析',
+    
     '/llm': 'LLM 管理',
     '/llm/providers': '提供商管理',
     '/llm/models': '模型管理',
@@ -147,6 +198,8 @@ const MainLayout = () => {
     // 处理动态路由，返回父路由
     if (pathname.match(/^\/rss-manager\/feeds\/detail\/\d+$/)) {
       return '/rss-manager/feeds';
+    } else if (pathname.match(/^\/rss-manager\/sync-logs\/detail\/[\w-]+$/)) {
+      return '/rss-manager/sync-logs';
     }
     
     return pathname;
