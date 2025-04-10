@@ -98,7 +98,7 @@ export async function updateGroup(options = {}) {
 
 // Update feed status
 export async function updateFeedStatus(options = {}) {
-  return request('/api/v1/rss/update_feed_status', {
+  return request('/api/v1/rss/update', {
     method: 'POST',
     data: options
   });

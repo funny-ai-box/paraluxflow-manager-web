@@ -18,7 +18,8 @@ import {
   Badge,
   Descriptions,
   Tooltip,
-  Empty
+  Empty,
+  Switch
 } from 'antd';
 import dayjs from 'dayjs';
 import { 
@@ -31,12 +32,16 @@ import {
   FileImageOutlined,
   EyeOutlined,
   ArrowLeftOutlined,
-  ExperimentOutlined
+  ExperimentOutlined,
+  GlobalOutlined,
+  PoweroffOutlined,
+  SettingOutlined
 } from '@ant-design/icons';
 
 import { 
   fetchRssFeedDetail, 
-  testFeedLinkCrawlerScript 
+  testFeedLinkCrawlerScript,
+  updateFeedStatus
 } from '@/services/rss';
 import { fetchRssFeedArticles } from '@/services/rss';
 import { syncFeedArticles } from '@/services/sync';
@@ -52,6 +57,8 @@ const { TabPane } = Tabs;
 export default function FeedDetail() {
   const [feedDetail, setFeedDetail] = useState({});
   const [loading, setLoading] = useState(false);
+  const [proxyLoading, setProxyLoading] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(false);
   const [testData, setTestData] = useState([]);
   const [showDrawer, setShowDrawer] = useState(false);
   const [showHtmlDrawer, setShowHtmlDrawer] = useState(false);
@@ -184,6 +191,59 @@ export default function FeedDetail() {
       console.error('获取HTML内容时出错:', error);
       message.error('获取HTML内容时发生错误');
       setHtmlLoading(false);
+    }
+  };
+  
+  const handleChangeFeedStatus = async (checked) => {
+    setStatusLoading(true);
+    try {
+      const response = await updateFeedStatus({
+        feed_id: id,
+        action: checked ? 'enable' : 'disable',
+      });
+      
+      if (response.code === 200) {
+        message.success('订阅源状态更新成功');
+        // 更新本地状态
+        setFeedDetail({
+          ...feedDetail,
+          is_active: checked ? 1 : 0
+        });
+      } else {
+        message.error(response.message || '更新状态失败');
+      }
+    } catch (error) {
+      console.error('更新订阅源状态时出错:', error);
+      message.error('更新状态失败');
+    } finally {
+      setStatusLoading(false);
+    }
+  };
+  
+  const handleChangeProxyStatus = async (checked) => {
+    setProxyLoading(true);
+    try {
+      const response = await updateFeedStatus({
+        feed_id: id,
+        field: 'use_proxy',
+        value: checked ? 1 : 0
+      });
+      
+      if (response.code === 200) {
+        message.success('代理设置更新成功');
+        // 更新本地状态
+        setFeedDetail({
+          ...feedDetail,
+          use_proxy: checked ? 1 : 0
+        });
+      } else {
+        message.error(response.message || '更新代理设置失败');
+      }
+    } catch (error) {
+      console.error('更新代理设置时出错:', error);
+      message.error('更新代理设置失败');
+    } finally {
+      setProxyLoading(false);
     }
   };
 
@@ -381,33 +441,76 @@ export default function FeedDetail() {
             
             <Divider style={{ margin: '16px 0' }} />
             
-       
-              
-                <Card 
-                  size="small" 
-                  title={
+            <Card 
+              size="small" 
+              title={
+                <Space>
+                  <SettingOutlined />
+                  <span>订阅源设置</span>
+                </Space>
+              }
+              style={{ borderRadius: 4, marginBottom: 16 }}
+            >
+              <Row gutter={24}>
+                <Col span={12}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
                     <Space>
-                      <CodeOutlined />
-                      <span>爬虫脚本</span>
+                      <GlobalOutlined />
+                      <span>使用代理访问</span>
+                      <Tooltip title="启用后，系统将通过代理服务器访问订阅源内容">
+                        <InfoCircleOutlined style={{ color: '#999' }} />
+                      </Tooltip>
                     </Space>
-                  }
-                  style={{ borderRadius: 4 }}
-                >
-                  <p>
-                    订阅源的内容处理由爬虫脚本负责，您可以根据需要定制爬虫脚本来提取文章内容。
-                  </p>
-                  {feedDetail.group_id ? (
-                    <Button type="primary" onClick={() => setShowGroupEditor(true)}>
-                      编辑分组脚本
-                    </Button>
-                  ) : (
-                    <Button type="primary" onClick={() => setShowEditor(true)}>
-                      编辑订阅源脚本
-                    </Button>
-                  )}
-                </Card>
-            
-          
+                    <Switch 
+                      checked={!!feedDetail.use_proxy} 
+                      onChange={handleChangeProxyStatus}
+                      loading={proxyLoading}
+                      checkedChildren="开启"
+                      unCheckedChildren="关闭"
+                    />
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
+                    <Space>
+                      <PoweroffOutlined />
+                      <span>订阅源状态</span>
+                    </Space>
+                    <Switch 
+                      checked={!!feedDetail.is_active}
+                      onChange={handleChangeFeedStatus}
+                      loading={statusLoading}
+                      checkedChildren="启用"
+                      unCheckedChildren="禁用"
+                    />
+                  </div>
+                </Col>
+              </Row>
+            </Card>
+              
+            <Card 
+              size="small" 
+              title={
+                <Space>
+                  <CodeOutlined />
+                  <span>爬虫脚本</span>
+                </Space>
+              }
+              style={{ borderRadius: 4 }}
+            >
+              <p>
+                订阅源的内容处理由爬虫脚本负责，您可以根据需要定制爬虫脚本来提取文章内容。
+              </p>
+              {feedDetail.group_id ? (
+                <Button type="primary" onClick={() => setShowGroupEditor(true)}>
+                  编辑分组脚本
+                </Button>
+              ) : (
+                <Button type="primary" onClick={() => setShowEditor(true)}>
+                  编辑订阅源脚本
+                </Button>
+              )}
+            </Card>
           </Col>
         </Row>
       </Card>

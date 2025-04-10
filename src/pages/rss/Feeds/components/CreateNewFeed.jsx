@@ -35,6 +35,7 @@ const CreateNewFeed = () => {
   const handleFinish = async (values) => {
     try {
       values.is_active = values.is_active ? 1 : 0;
+      values.use_proxy = values.use_proxy ? 1 : 0;
 
       if (fileList.length > 0) {
         const formData = new FormData();
@@ -103,7 +104,7 @@ const CreateNewFeed = () => {
     <>
       <DrawerForm
         title={
-          <Text className="text-lg font-medium">Create New Feed</Text>
+          <Text className="text-lg font-medium">创建新订阅源</Text>
         }
         width={680}
         open={drawerVisible}
@@ -111,14 +112,14 @@ const CreateNewFeed = () => {
         trigger={
           <Button type="primary" className="flex items-center gap-2 px-4 h-9 rounded-lg shadow-none">
             <PlusOutlined />
-            New Feed
+            新建订阅源
           </Button>
         }
         onFinish={handleFinish}
         submitter={{
           searchConfig: {
-            submitText: 'Create Feed',
-            resetText: 'Cancel',
+            submitText: '创建订阅源',
+            resetText: '取消',
           },
           submitButtonProps: {
             className: 'rounded-lg shadow-none h-9',
@@ -143,10 +144,10 @@ const CreateNewFeed = () => {
   
             <ProFormText
               name="title"
-              label="Feed Title"
-              tooltip="Maximum 24 characters"
-              placeholder="Enter your feed title"
-              rules={[{ required: true, message: 'Please enter a title' }]}
+              label="订阅源标题"
+              tooltip="最多24个字符"
+              placeholder="请输入订阅源标题"
+              rules={[{ required: true, message: '请输入标题' }]}
               fieldProps={{
                 prefix: <InfoCircleOutlined className="text-gray-400" />,
                 className: 'rounded-lg',
@@ -155,8 +156,8 @@ const CreateNewFeed = () => {
             
             <ProFormText
               name="description"
-              label="Description"
-              placeholder="Enter a brief description of your feed"
+              label="描述"
+              placeholder="请输入订阅源的简短描述"
               fieldProps={{
                 prefix: <InfoCircleOutlined className="text-gray-400" />,
                 className: 'rounded-lg',
@@ -165,9 +166,9 @@ const CreateNewFeed = () => {
             
             <ProFormText 
               name="url" 
-              label="Feed URL"
-              placeholder="Enter the RSS feed URL"
-              rules={[{ required: true, message: 'Please enter the feed URL' }]}
+              label="订阅源URL"
+              placeholder="请输入RSS订阅源URL"
+              rules={[{ required: true, message: '请输入订阅源URL' }]}
               fieldProps={{
                 prefix: <LinkOutlined className="text-gray-400" />,
                 className: 'rounded-lg',
@@ -187,7 +188,7 @@ const CreateNewFeed = () => {
               {fileList.length === 0 && (
                 <div className="text-center">
                   <PlusOutlined className="text-lg" />
-                  <div className="mt-2 text-sm">Upload Logo</div>
+                  <div className="mt-2 text-sm">上传Logo</div>
                 </div>
               )}
             </Upload>
@@ -198,13 +199,13 @@ const CreateNewFeed = () => {
    
             <ProFormSelect
               name="group_id"
-              label="Group"
+              label="分组"
               request={async () => {
                 const { data } = await getGroupList();
                 return data.map((e) => ({ label: e.title, value: e.id }));
               }}
-              placeholder="Select a group"
-              rules={[{ required: true, message: 'Please select a group' }]}
+              placeholder="选择一个分组"
+              rules={[{ required: true, message: '请选择一个分组' }]}
               fieldProps={{
                 className: 'rounded-lg',
               }}
@@ -212,13 +213,13 @@ const CreateNewFeed = () => {
             
             <ProFormSelect
               name="category_id"
-              label="Category"
+              label="分类"
               options={feedCategories.map((category) => ({
                 label: category.text,
                 value: category.id,
               }))}
-              placeholder="Select a category"
-              rules={[{ required: true, message: 'Please select a category' }]}
+              placeholder="选择一个分类"
+              rules={[{ required: true, message: '请选择一个分类' }]}
               fieldProps={{
                 className: 'rounded-lg',
               }}
@@ -229,13 +230,25 @@ const CreateNewFeed = () => {
 
           {/* Settings Section */}
           <div className="bg-white p-6 rounded-lg">
-
             <ProFormSwitch
               label={
                 <Space>
-                  <span>Enable Feed</span>
+                  <span>开启代理</span>
                   <Text type="secondary" className="text-sm">
-                    (Disabled by default until script setup is complete)
+                    (使用代理访问订阅源内容)
+                  </Text>
+                </Space>
+              }
+              name="use_proxy"
+              initialValue={0}
+            />
+            
+            <ProFormSwitch
+              label={
+                <Space>
+                  <span>启用订阅源</span>
+                  <Text type="secondary" className="text-sm">
+                    (默认禁用，直到脚本设置完成)
                   </Text>
                 </Space>
               }
