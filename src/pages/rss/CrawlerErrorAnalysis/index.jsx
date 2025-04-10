@@ -17,7 +17,11 @@ import {
   Divider,
   Alert,
   Tag,
-  InputNumber
+  InputNumber,
+  Drawer,
+  Badge,
+  Tooltip,
+  List
 } from 'antd';
 import { 
   ReloadOutlined, 
@@ -26,9 +30,13 @@ import {
   ExclamationCircleOutlined,
   BugOutlined,
   FileTextOutlined,
-  InfoCircleOutlined
+  InfoCircleOutlined,
+  EyeOutlined,
+  LinkOutlined,
+  ClockCircleOutlined
 } from '@ant-design/icons';
-import { analyzeCrawlerErrors } from '@/services/crawler';
+import { analyzeCrawlerErrors, fetchFeedFailedArticles } from '@/services/crawler';
+import { Link } from 'react-router-dom';
 import { 
   ResponsiveContainer, 
   BarChart, 
@@ -39,7 +47,7 @@ import {
   XAxis, 
   YAxis, 
   CartesianGrid, 
-  Tooltip, 
+  Tooltip as RechartsTooltip, 
   Legend 
 } from 'recharts';
 import dayjs from 'dayjs';
@@ -62,6 +70,13 @@ const CrawlerErrorAnalysis = () => {
   const [limit, setLimit] = useState(10);
   const [form] = Form.useForm();
 
+  // 侧滑抽屉相关状态
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [currentFeedId, setCurrentFeedId] = useState(null);
+  const [currentFeedTitle, setCurrentFeedTitle] = useState('');
+  const [failedArticles, setFailedArticles] = useState([]);
+  const [drawerLoading, setDrawerLoading] = useState(false);
+
   const fetchErrorAnalysis = async (params = {}) => {
     setLoading(true);
     try {
@@ -83,6 +98,35 @@ const CrawlerErrorAnalysis = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // 获取订阅源的失败文章列表
+  const fetchFailedArticlesByFeed = async (feedId) => {
+    setDrawerLoading(true);
+    try {
+      const response = await fetchFeedFailedArticles(feedId);
+      if (response.code === 200) {
+        setFailedArticles(response.data.list || []);
+        setCurrentFeedTitle(response.data.feed_title || '未知订阅源');
+      } else {
+        message.error(response.message || '获取失败文章列表失败');
+        setFailedArticles([]);
+      }
+    } catch (error) {
+      console.error('获取失败文章列表时出错:', error);
+      message.error('获取失败文章列表时发生错误');
+      setFailedArticles([]);
+    } finally {
+      setDrawerLoading(false);
+    }
+  };
+
+  // 打开侧滑抽屉并加载数据
+  const handleViewFailedArticles = (feedId, feedTitle) => {
+    setCurrentFeedId(feedId);
+    setCurrentFeedTitle(feedTitle || '未知订阅源');
+    setDrawerVisible(true);
+    fetchFailedArticlesByFeed(feedId);
   };
 
   useEffect(() => {
@@ -148,7 +192,7 @@ const CrawlerErrorAnalysis = () => {
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip formatter={(value, name, entry) => [`${value} (${entry.payload.percentage.toFixed(1)}%)`, entry.payload.error_type]} />
+            <RechartsTooltip formatter={(value, name, entry) => [`${value} (${entry.payload.percentage.toFixed(1)}%)`, entry.payload.error_type]} />
             <Legend />
           </PieChart>
         </ResponsiveContainer>
@@ -181,7 +225,7 @@ const CrawlerErrorAnalysis = () => {
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip formatter={(value, name, entry) => [`${value} (${entry.payload.percentage.toFixed(1)}%)`, entry.payload.error_stage]} />
+            <RechartsTooltip formatter={(value, name, entry) => [`${value} (${entry.payload.percentage.toFixed(1)}%)`, entry.payload.error_stage]} />
             <Legend />
           </PieChart>
         </ResponsiveContainer>
@@ -274,15 +318,24 @@ const CrawlerErrorAnalysis = () => {
     );
   };
 
+
   // 渲染错误订阅源表格
   const renderErrorFeedsTable = () => {
     if (!errorData || !errorData.top_error_feeds) return null;
 
     const columns = [
       {
-        title: '订阅源ID',
+        title: '订阅源',
         dataIndex: 'feed_id',
         key: 'feed_id',
+        render: (text, record) => (
+          <Space>
+            <Link to={`/rss-manager/feeds/detail/${text}`}>
+              <Text strong>{record.feed_title || text}</Text>
+            </Link>
+            <Text type="secondary">ID: {text}</Text>
+          </Space>
+        ),
       },
       {
         title: '错误次数',
@@ -296,6 +349,20 @@ const CrawlerErrorAnalysis = () => {
         key: 'percentage',
         render: (text) => `${text.toFixed(2)}%`,
         sorter: (a, b) => a.percentage - b.percentage,
+      },
+      {
+        title: '操作',
+        key: 'action',
+        render: (_, record) => (
+          <Button 
+            type="primary" 
+            size="small" 
+            icon={<EyeOutlined />} 
+            onClick={() => handleViewFailedArticles(record.feed_id, record.feed_title)}
+          >
+            查看失败文章
+          </Button>
+        ),
       },
     ];
 
@@ -356,6 +423,81 @@ const CrawlerErrorAnalysis = () => {
       </Card>
     );
   };
+
+  // 渲染订阅源失败文章列表的侧滑抽屉
+  const renderFailedArticlesDrawer = () => (
+    <Drawer
+      title={
+        <Space direction="vertical" size={0}>
+          <Text strong style={{ fontSize: 16 }}>订阅源失败文章列表</Text>
+          <Text type="secondary">
+            {currentFeedTitle} (ID: {currentFeedId})
+          </Text>
+        </Space>
+      }
+      width={1200}
+      placement="right"
+      onClose={() => setDrawerVisible(false)}
+      open={drawerVisible}
+      destroyOnClose
+    >
+      <Spin spinning={drawerLoading}>
+        {failedArticles.length > 0 ? (
+          <List
+            dataSource={failedArticles}
+            renderItem={item => (
+              <List.Item
+                key={item.id}
+                actions={[
+               
+                    <Button size="small" onClick={()=>{window.open(item.link)}} type="primary" icon={<EyeOutlined />}>
+                      查看文章
+                    </Button>
+           
+                ]}
+              >
+                <List.Item.Meta
+                  title={
+                    <Space>
+                      <Text strong>{item.title}</Text>
+                      <Badge status="error" text="失败" />
+                    </Space>
+                  }
+                  description={
+                    <Space direction="vertical" size={2}>
+                      <Text type="secondary" ellipsis>{item.link}</Text>
+                      <Space>
+                        <Text type="secondary">
+                          <ClockCircleOutlined /> {item.created_at}
+                        </Text>
+                        <Text type="secondary">
+                          错误阶段: <Tag color="red">{item.error_stage || '未知'}</Tag>
+                        </Text>
+                      </Space>
+                      <div style={{ marginTop: 8 }}>
+                        <Alert
+                          message="错误信息"
+                          description={item.error_message || '未知错误'}
+                          type="error"
+                          showIcon
+                        />
+                      </div>
+                    </Space>
+                  }
+                />
+              </List.Item>
+            )}
+            pagination={{
+              pageSize: 5,
+              showTotal: (total) => `共 ${total} 条失败记录`,
+            }}
+          />
+        ) : (
+          <Empty description="暂无失败文章数据" />
+        )}
+      </Spin>
+    </Drawer>
+  );
 
   return (
     <div style={{ padding: 16 }}>
@@ -462,6 +604,9 @@ const CrawlerErrorAnalysis = () => {
           )}
         </Spin>
       </Card>
+      
+      {/* 订阅源失败文章列表抽屉 */}
+      {renderFailedArticlesDrawer()}
     </div>
   );
 };

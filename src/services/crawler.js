@@ -32,3 +32,25 @@ export async function analyzeCrawlerErrors(params = {}) {
     params
   });
 }
+
+
+// 获取指定订阅源的失败文章列表
+export async function fetchFeedFailedArticles(feed_id, params = {}) {
+      return request('/api/v1/rss/crawler/feed_failed_articles', {
+        method: 'GET',
+        params: {
+          feed_id,
+          ...params
+        }
+      });
+    }
+    
+    // 获取文章的爬取失败详情
+    export async function fetchArticleCrawlErrors(article_id) {
+      return request('/api/v1/rss/crawler/article_errors', {
+        method: 'GET',
+        params: {
+          article_id
+        }
+      });
+    }
