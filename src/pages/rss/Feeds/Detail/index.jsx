@@ -41,7 +41,7 @@ import {
 import { 
   fetchRssFeedDetail, 
   testFeedLinkCrawlerScript,
-  updateFeedStatus
+  updateFeed
 } from '@/services/rss';
 import { fetchRssFeedArticles } from '@/services/rss';
 import { syncFeedArticles } from '@/services/sync';
@@ -197,9 +197,9 @@ export default function FeedDetail() {
   const handleChangeFeedStatus = async (checked) => {
     setStatusLoading(true);
     try {
-      const response = await updateFeedStatus({
+      const response = await updateFeed({
         feed_id: id,
-        action: checked ? 'enable' : 'disable',
+        is_active: checked ? 1 : 0,
       });
       
       if (response.code === 200) {
@@ -223,10 +223,9 @@ export default function FeedDetail() {
   const handleChangeProxyStatus = async (checked) => {
     setProxyLoading(true);
     try {
-      const response = await updateFeedStatus({
+      const response = await updateFeed({
         feed_id: id,
-        field: 'use_proxy',
-        value: checked ? 1 : 0
+        use_proxy: checked ? 1 : 0,
       });
       
       if (response.code === 200) {

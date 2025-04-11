@@ -197,7 +197,7 @@ const Login = () => {
                   </Button>
                 </Form.Item>
               </Form>
-              
+{/*               
               <Divider plain>
                 <Text type="secondary">还没有账号?</Text>
               </Divider>
@@ -209,7 +209,7 @@ const Login = () => {
                   </Button>
                 </Link>
               </div>
-              
+               */}
               <div style={{ marginTop: 48, textAlign: 'center' }}>
                 <Text type="secondary" style={{ fontSize: 12 }}>
                   <SafetyOutlined style={{ marginRight: 4 }} />

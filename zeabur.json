@@ -1,0 +1,8 @@
+{
+      "buildCommand": "npm run build",
+      "outputDirectory": "dist",
+      "startCommand": "npm run preview",
+      "framework": "vite",
+      "port": 3000,
+      "nodeVersion": "22"
+    }

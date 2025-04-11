@@ -1,5 +1,5 @@
 import {
-  fetchRssFeeds, updateFeedStatus
+  fetchRssFeeds, updateFeed
 } from '@/services/rss';
 import { batchSyncFeedArticles } from '@/services/sync';
 import { useEffect, useState } from 'react';
@@ -139,9 +139,9 @@ const Feeds = () => {
   const handleChangeFeedStatus = async (checked, record) => {
     setLoading(true);
     try {
-      const response = await updateFeedStatus({
+      const response = await updateFeed({
         feed_id: record.id,
-        action: checked ? 'enable' : 'disable',
+        is_active: checked ? 1 : 0,
       });
       
       if (response.code === 200) {
