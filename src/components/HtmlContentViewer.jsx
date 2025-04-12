@@ -137,8 +137,8 @@ const HtmlContentViewer = ({ htmlContent }) => {
       Array.from(images).forEach(img => {
         const originalSrc = img.getAttribute('src');
         img.onerror = () => {
-          if (!img.src.includes('/api/v1/article/proxy-image')) {
-            img.src = `/api/v1/article/proxy-image?url=${encodeURIComponent(originalSrc)}`;
+          if (!img.src.includes('/api/admin/v1/article/proxy-image')) {
+            img.src = `/api/admin/v1/article/proxy-image?url=${encodeURIComponent(originalSrc)}`;
           }
         };
         

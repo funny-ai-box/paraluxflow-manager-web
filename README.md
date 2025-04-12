@@ -46,7 +46,7 @@
  * }
  */
 export async function fetchTemplates(params = {}) {
-  return request('/api/v1/templates', {
+  return request('/api/admin/v1/templates', {
     method: 'GET',
     params
   });
@@ -80,7 +80,7 @@ export async function fetchTemplates(params = {}) {
  * }
  */
 export async function fetchTemplateDetail(id) {
-  return request(`/api/v1/templates/detail`, {
+  return request(`/api/admin/v1/templates/detail`, {
     method: 'GET',
     params: { id }
   });
@@ -113,7 +113,7 @@ export async function fetchTemplateDetail(id) {
  * }
  */
 export async function createTemplate(data) {
-  return request('/api/v1/templates/create', {
+  return request('/api/admin/v1/templates/create', {
     method: 'POST',
     data
   });
@@ -147,7 +147,7 @@ export async function createTemplate(data) {
  * }
  */
 export async function updateTemplate(id, data) {
-  return request(`/api/v1/templates/update`, {
+  return request(`/api/admin/v1/templates/update`, {
     method: 'POST',
     data: { id, ...data }
   });
@@ -170,7 +170,7 @@ export async function updateTemplate(id, data) {
  * }
  */
 export async function updateTemplateStatus(data) {
-  return request('/api/v1/templates/update_status', {
+  return request('/api/admin/v1/templates/update_status', {
     method: 'POST',
     data
   });
@@ -194,7 +194,7 @@ export async function updateTemplateStatus(data) {
  * }
  */
 export async function fetchTemplateScript(id) {
-  return request(`/api/v1/templates/script`, {
+  return request(`/api/admin/v1/templates/script`, {
     method: 'GET',
     params: { id }
   });
@@ -217,7 +217,7 @@ export async function fetchTemplateScript(id) {
  * }
  */
 export async function updateTemplateScript(id, data) {
-  return request(`/api/v1/templates/update_script`, {
+  return request(`/api/admin/v1/templates/update_script`, {
     method: 'POST',
     data: { id, ...data }
   });
@@ -242,7 +242,7 @@ export async function updateTemplateScript(id, data) {
  * }
  */
 export async function testTemplateScript(formData) {
-  return request('/api/v1/templates/test_script', {
+  return request('/api/admin/v1/templates/test_script', {
     method: 'POST',
     data: formData,
     headers: {
@@ -279,7 +279,7 @@ export async function testTemplateScript(formData) {
  * }
  */
 export async function fetchTemplateUsage(id) {
-  return request(`/api/v1/templates/usage`, {
+  return request(`/api/admin/v1/templates/usage`, {
     method: 'GET',
     params: { id }
   });
@@ -321,7 +321,7 @@ export async function fetchTemplateUsage(id) {
  * }
  */
 export async function fetchRecommendationRules() {
-  return request('/api/v1/recommendation/rules', {
+  return request('/api/admin/v1/recommendation/rules', {
     method: 'GET'
   });
 }
@@ -352,7 +352,7 @@ export async function fetchRecommendationRules() {
  * }
  */
 export async function createRecommendationRule(data) {
-  return request('/api/v1/recommendation/rules/create', {
+  return request('/api/admin/v1/recommendation/rules/create', {
     method: 'POST',
     data
   });
@@ -383,7 +383,7 @@ export async function createRecommendationRule(data) {
  * }
  */
 export async function updateRecommendationRule(id, data) {
-  return request(`/api/v1/recommendation/rules/update`, {
+  return request(`/api/admin/v1/recommendation/rules/update`, {
     method: 'POST',
     data: { id, ...data }
   });
@@ -403,7 +403,7 @@ export async function updateRecommendationRule(id, data) {
  * }
  */
 export async function deleteRecommendationRule(id) {
-  return request(`/api/v1/recommendation/rules/delete`, {
+  return request(`/api/admin/v1/recommendation/rules/delete`, {
     method: 'POST',
     data: { id }
   });
@@ -428,7 +428,7 @@ export async function deleteRecommendationRule(id) {
  * }
  */
 export async function reorderRecommendationRules(data) {
-  return request('/api/v1/recommendation/rules/reorder', {
+  return request('/api/admin/v1/recommendation/rules/reorder', {
     method: 'POST',
     data
   });
@@ -481,7 +481,7 @@ export async function reorderRecommendationRules(data) {
  * }
  */
 export async function fetchContentList(params = {}) {
-  return request('/api/v1/recommendation/content', {
+  return request('/api/admin/v1/recommendation/content', {
     method: 'GET',
     params
   });
@@ -506,7 +506,7 @@ export async function fetchContentList(params = {}) {
  * }
  */
 export async function adjustContentScore(id, data) {
-  return request(`/api/v1/recommendation/content/adjust_score`, {
+  return request(`/api/admin/v1/recommendation/content/adjust_score`, {
     method: 'POST',
     data: { id, ...data }
   });
@@ -526,7 +526,7 @@ export async function adjustContentScore(id, data) {
  * }
  */
 export async function pinContent(id) {
-  return request(`/api/v1/recommendation/content/pin`, {
+  return request(`/api/admin/v1/recommendation/content/pin`, {
     method: 'POST',
     data: { id }
   });
@@ -546,7 +546,7 @@ export async function pinContent(id) {
  * }
  */
 export async function unpinContent(id) {
-  return request(`/api/v1/recommendation/content/unpin`, {
+  return request(`/api/admin/v1/recommendation/content/unpin`, {
     method: 'POST',
     data: { id }
   });
@@ -566,7 +566,7 @@ export async function unpinContent(id) {
  * }
  */
 export async function lockContent(id) {
-  return request(`/api/v1/recommendation/content/lock`, {
+  return request(`/api/admin/v1/recommendation/content/lock`, {
     method: 'POST',
     data: { id }
   });
@@ -586,7 +586,7 @@ export async function lockContent(id) {
  * }
  */
 export async function unlockContent(id) {
-  return request(`/api/v1/recommendation/content/unlock`, {
+  return request(`/api/admin/v1/recommendation/content/unlock`, {
     method: 'POST',
     data: { id }
   });
@@ -612,7 +612,7 @@ export async function unlockContent(id) {
  * }
  */
 export async function bulkAdjustContent(data) {
-  return request('/api/v1/recommendation/content/bulk_adjust', {
+  return request('/api/admin/v1/recommendation/content/bulk_adjust', {
     method: 'POST',
     data
   });
@@ -655,7 +655,7 @@ export async function bulkAdjustContent(data) {
  * }
  */
 export async function fetchAIModels() {
-  return request('/api/v1/ai/models', {
+  return request('/api/admin/v1/ai/models', {
     method: 'GET'
   });
 }
@@ -689,7 +689,7 @@ export async function fetchAIModels() {
  * }
  */
 export async function createAIModel(data) {
-  return request('/api/v1/ai/models/create', {
+  return request('/api/admin/v1/ai/models/create', {
     method: 'POST',
     data
   });
@@ -723,7 +723,7 @@ export async function createAIModel(data) {
  * }
  */
 export async function updateAIModel(id, data) {
-  return request(`/api/v1/ai/models/update`, {
+  return request(`/api/admin/v1/ai/models/update`, {
     method: 'POST',
     data: { id, ...data }
   });
@@ -743,7 +743,7 @@ export async function updateAIModel(id, data) {
  * }
  */
 export async function deleteAIModel(id) {
-  return request(`/api/v1/ai/models/delete`, {
+  return request(`/api/admin/v1/ai/models/delete`, {
     method: 'POST',
     data: { id }
   });
@@ -776,7 +776,7 @@ export async function deleteAIModel(id) {
  * }
  */
 export async function fetchContentTypes() {
-  return request('/api/v1/ai/content-types', {
+  return request('/api/admin/v1/ai/content-types', {
     method: 'GET'
   });
 }
@@ -803,7 +803,7 @@ export async function fetchContentTypes() {
  * }
  */
 export async function updateContentTypeModelMapping(id, data) {
-  return request(`/api/v1/ai/content-types/update_mapping`, {
+  return request(`/api/admin/v1/ai/content-types/update_mapping`, {
     method: 'POST',
     data: { content_type_id: id, ...data }
   });
@@ -840,7 +840,7 @@ export async function updateContentTypeModelMapping(id, data) {
  * }
  */
 export async function fetchSummaryTemplates() {
-  return request('/api/v1/ai/templates', {
+  return request('/api/admin/v1/ai/templates', {
     method: 'GET'
   });
 }
@@ -872,7 +872,7 @@ export async function fetchSummaryTemplates() {
  * }
  */
 export async function createSummaryTemplate(data) {
-  return request('/api/v1/ai/templates/create', {
+  return request('/api/admin/v1/ai/templates/create', {
     method: 'POST',
     data
   });
@@ -904,7 +904,7 @@ export async function createSummaryTemplate(data) {
  * }
  */
 export async function updateSummaryTemplate(id, data) {
-  return request(`/api/v1/ai/templates/update`, {
+  return request(`/api/admin/v1/ai/templates/update`, {
     method: 'POST',
     data: { id, ...data }
   });
@@ -924,7 +924,7 @@ export async function updateSummaryTemplate(id, data) {
  * }
  */
 export async function deleteSummaryTemplate(id) {
-  return request(`/api/v1/ai/templates/delete`, {
+  return request(`/api/admin/v1/ai/templates/delete`, {
     method: 'POST',
     data: { id }
   });
@@ -953,7 +953,7 @@ export async function deleteSummaryTemplate(id) {
  * }
  */
 export async function testSummaryTemplate(id) {
-  return request(`/api/v1/ai/templates/test`, {
+  return request(`/api/admin/v1/ai/templates/test`, {
     method: 'POST',
     data: { id }
   });
@@ -1036,7 +1036,7 @@ export async function testSummaryTemplate(id) {
  * }
  */
 export async function fetchFeedbackAnalytics(params = {}) {
-  return request('/api/v1/ai/feedback/analytics', {
+  return request('/api/admin/v1/ai/feedback/analytics', {
     method: 'GET',
     params
   });
@@ -1081,7 +1081,7 @@ export async function fetchFeedbackAnalytics(params = {}) {
  * }
  */
 export async function fetchFeedbackDetails(params = {}) {
-  return request('/api/v1/ai/feedback/details', {
+  return request('/api/admin/v1/ai/feedback/details', {
     method: 'GET',
     params
   });
@@ -1101,7 +1101,7 @@ export async function fetchFeedbackDetails(params = {}) {
  * Blob对象（文件下载）
  */
 export async function exportFeedbackData(params = {}) {
-  return request('/api/v1/ai/feedback/export', {
+  return request('/api/admin/v1/ai/feedback/export', {
     method: 'GET',
     params,
     responseType: 'blob'
@@ -1149,7 +1149,7 @@ export async function exportFeedbackData(params = {}) {
  * }
  */
 export async function fetchScheduledTasks() {
-  return request('/api/v1/tasks/scheduled', {
+  return request('/api/admin/v1/tasks/scheduled', {
     method: 'GET'
   });
 }
@@ -1182,7 +1182,7 @@ export async function fetchScheduledTasks() {
  * }
  */
 export async function createScheduledTask(data) {
-  return request('/api/v1/tasks/scheduled/create', {
+  return request('/api/admin/v1/tasks/scheduled/create', {
     method: 'POST',
     data
   });
@@ -1215,7 +1215,7 @@ export async function createScheduledTask(data) {
  * }
  */
 export async function updateScheduledTask(id, data) {
-  return request(`/api/v1/tasks/scheduled/update`, {
+  return request(`/api/admin/v1/tasks/scheduled/update`, {
     method: 'POST',
     data: { id, ...data }
   });
@@ -1235,7 +1235,7 @@ export async function updateScheduledTask(id, data) {
  * }
  */
 export async function deleteScheduledTask(id) {
-  return request(`/api/v1/tasks/scheduled/delete`, {
+  return request(`/api/admin/v1/tasks/scheduled/delete`, {
     method: 'POST',
     data: { id }
   });
@@ -1257,7 +1257,7 @@ export async function deleteScheduledTask(id) {
  * }
  */
 export async function runTaskManually(id) {
-  return request(`/api/v1/tasks/scheduled/run`, {
+  return request(`/api/admin/v1/tasks/scheduled/run`, {
     method: 'POST',
     data: { id }
   });
@@ -1284,7 +1284,7 @@ export async function runTaskManually(id) {
  * }
  */
 export async function fetchTaskGroups() {
-  return request('/api/v1/tasks/groups', {
+  return request('/api/admin/v1/tasks/groups', {
     method: 'GET'
   });
 }
@@ -1318,7 +1318,7 @@ export async function fetchTaskGroups() {
  * }
  */
 export async function fetchTaskHistory(taskId) {
-  return request(`/api/v1/tasks/history`, {
+  return request(`/api/admin/v1/tasks/history`, {
     method: 'GET',
     params: { task_id: taskId }
   });
@@ -1363,7 +1363,7 @@ export async function fetchTaskHistory(taskId) {
  * }
  */
 export async function fetchTasksStats(params = {}) {
-  return request('/api/v1/tasks/stats', {
+  return request('/api/admin/v1/tasks/stats', {
     method: 'GET',
     params
   });
@@ -1394,7 +1394,7 @@ export async function fetchTasksStats(params = {}) {
  * }
  */
 export async function fetchActiveRuns() {
-  return request('/api/v1/tasks/runs/active', {
+  return request('/api/admin/v1/tasks/runs/active', {
     method: 'GET'
   });
 }
@@ -1429,7 +1429,7 @@ export async function fetchActiveRuns() {
  * }
  */
 export async function fetchRecentTasks(params = {}) {
-  return request('/api/v1/tasks/recent', {
+  return request('/api/admin/v1/tasks/recent', {
     method: 'GET',
     params
   });
@@ -1470,7 +1470,7 @@ export async function fetchRecentTasks(params = {}) {
  * }
  */
 export async function fetchTasksPerformance(params = {}) {
-  return request('/api/v1/tasks/performance', {
+  return request('/api/admin/v1/tasks/performance', {
     method: 'GET',
     params
   });
@@ -1490,7 +1490,7 @@ export async function fetchTasksPerformance(params = {}) {
  * Blob对象（文件下载）
  */
 export async function exportTasksReport(params = {}) {
-  return request('/api/v1/tasks/export', {
+  return request('/api/admin/v1/tasks/export', {
     method: 'GET',
     params,
     responseType: 'blob'
@@ -1553,7 +1553,7 @@ export async function exportTasksReport(params = {}) {
  * }
  */
 export async function fetchCrawlStats(params = {}) {
-  return request('/api/v1/statistics/crawl', {
+  return request('/api/admin/v1/statistics/crawl', {
     method: 'GET',
     params
   });
@@ -1606,7 +1606,7 @@ export async function fetchCrawlStats(params = {}) {
  * }
  */
 export async function fetchSubscriptionStats(params = {}) {
-  return request('/api/v1/statistics/subscriptions', {
+  return request('/api/admin/v1/statistics/subscriptions', {
     method: 'GET',
     params
   });
@@ -1662,7 +1662,7 @@ export async function fetchSubscriptionStats(params = {}) {
  * }
  */
 export async function fetchSourceStats(params = {}) {
-  return request('/api/v1/statistics/sources', {
+  return request('/api/admin/v1/statistics/sources', {
     method: 'GET',
     params
   });
@@ -1683,7 +1683,7 @@ export async function fetchSourceStats(params = {}) {
  * Blob对象（文件下载）
  */
 export async function exportStatisticsData(params = {}) {
-  return request('/api/v1/statistics/export', {
+  return request('/api/admin/v1/statistics/export', {
     method: 'GET',
     params,
     responseType: 'blob'
@@ -1732,7 +1732,7 @@ export async function exportStatisticsData(params = {}) {
  * }
  */
 export async function fetchSystemLogs(params = {}) {
-  return request('/api/v1/system/logs', {
+  return request('/api/admin/v1/system/logs', {
     method: 'GET',
     params
   });
@@ -1754,7 +1754,7 @@ export async function fetchSystemLogs(params = {}) {
  * Blob对象（文件下载）
  */
 export async function exportLogs(params = {}) {
-  return request('/api/v1/system/logs/export', {
+  return request('/api/admin/v1/system/logs/export', {
     method: 'GET',
     params,
     responseType: 'blob'
@@ -1794,7 +1794,7 @@ export async function exportLogs(params = {}) {
  * }
  */
 export async function fetchAlertRules() {
-  return request('/api/v1/system/alerts/rules', {
+  return request('/api/admin/v1/system/alerts/rules', {
     method: 'GET'
   });
 }
@@ -1829,7 +1829,7 @@ export async function fetchAlertRules() {
  * }
  */
 export async function createAlertRule(data) {
-  return request('/api/v1/system/alerts/rules/create', {
+  return request('/api/admin/v1/system/alerts/rules/create', {
     method: 'POST',
     data
   });
@@ -1864,7 +1864,7 @@ export async function createAlertRule(data) {
  * }
  */
 export async function updateAlertRule(id, data) {
-  return request(`/api/v1/system/alerts/rules/update`, {
+  return request(`/api/admin/v1/system/alerts/rules/update`, {
     method: 'POST',
     data: { id, ...data }
   });
@@ -1884,7 +1884,7 @@ export async function updateAlertRule(id, data) {
  * }
  */
 export async function deleteAlertRule(id) {
-  return request(`/api/v1/system/alerts/rules/delete`, {
+  return request(`/api/admin/v1/system/alerts/rules/delete`, {
     method: 'POST',
     data: { id }
   });
@@ -1923,7 +1923,7 @@ export async function deleteAlertRule(id) {
  * }
  */
 export async function fetchAlertHistory(params = {}) {
-  return request('/api/v1/system/alerts/history', {
+  return request('/api/admin/v1/system/alerts/history', {
     method: 'GET',
     params
   });
@@ -1957,7 +1957,7 @@ export async function fetchAlertHistory(params = {}) {
  * }
  */
 export async function testAlertRule(id) {
-  return request(`/api/v1/system/alerts/rules/test`, {
+  return request(`/api/admin/v1/system/alerts/rules/test`, {
     method: 'POST',
     data: { id }
   });

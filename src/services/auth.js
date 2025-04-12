@@ -3,7 +3,7 @@
 import request, { saveAuthToken, clearAuthToken, getAuthToken } from '@/utils/request';
 
 export async function login(data) {
-  const response = await request('/api/v1/auth/login', {
+  const response = await request('/api/admin/v1/auth/login', {
     method: 'POST',
     data
   });
@@ -27,14 +27,14 @@ export function isAuthenticated() {
 
 
 export async function register(data) {
-  return request('/api/v1/auth/register', {
+  return request('/api/admin/v1/auth/register', {
     method: 'POST',
     data
   });
 }
 
 export async function getPublicKey() {
-  return request('/api/v1/auth/public_key', {
+  return request('/api/admin/v1/auth/public_key', {
     method: 'GET'
   });
 }

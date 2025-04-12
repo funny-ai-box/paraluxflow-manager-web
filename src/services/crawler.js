@@ -3,7 +3,7 @@ import request from '@/utils/request';
 
 // 获取爬取日志列表
 export async function fetchCrawlerLogs(params = {}) {
-  return request('/api/v1/rss/crawler/logs', {
+  return request('/api/admin/v1/rss/crawler/logs', {
     method: 'GET',
     params
   });
@@ -11,7 +11,7 @@ export async function fetchCrawlerLogs(params = {}) {
 
 // 获取爬虫统计信息
 export async function fetchCrawlerStats(params = {}) {
-  return request('/api/v1/rss/crawler/stats', {
+  return request('/api/admin/v1/rss/crawler/stats', {
     method: 'GET',
     params
   });
@@ -19,7 +19,7 @@ export async function fetchCrawlerStats(params = {}) {
 
 // 分析爬虫性能
 export async function analyzeCrawlerPerformance(params = {}) {
-  return request('/api/v1/rss/crawler/analyze', {
+  return request('/api/admin/v1/rss/crawler/analyze', {
     method: 'GET',
     params
   });
@@ -27,7 +27,7 @@ export async function analyzeCrawlerPerformance(params = {}) {
 
 // 分析爬虫错误
 export async function analyzeCrawlerErrors(params = {}) {
-  return request('/api/v1/rss/crawler/error_analysis', {
+  return request('/api/admin/v1/rss/crawler/error_analysis', {
     method: 'GET',
     params
   });
@@ -36,7 +36,7 @@ export async function analyzeCrawlerErrors(params = {}) {
 
 // 获取指定订阅源的失败文章列表
 export async function fetchFeedFailedArticles(feed_id, params = {}) {
-      return request('/api/v1/rss/crawler/feed_failed_articles', {
+      return request('/api/admin/v1/rss/crawler/feed_failed_articles', {
         method: 'GET',
         params: {
           feed_id,
@@ -47,7 +47,7 @@ export async function fetchFeedFailedArticles(feed_id, params = {}) {
     
     // 获取文章的爬取失败详情
     export async function fetchArticleCrawlErrors(article_id) {
-      return request('/api/v1/rss/crawler/article_errors', {
+      return request('/api/admin/v1/rss/crawler/article_errors', {
         method: 'GET',
         params: {
           article_id
