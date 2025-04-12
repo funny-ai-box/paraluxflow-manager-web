@@ -1,6 +1,7 @@
 // src/main.jsx
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { App as AntApp } from 'antd';
 import { RouterProvider } from 'react-router-dom'
 import { ConfigProvider } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
@@ -20,7 +21,9 @@ createRoot(document.getElementById('root')).render(
         },
       }}
     >
+       <AntApp>
       <RouterProvider router={router} />
+      </AntApp>
     </ConfigProvider>
   </StrictMode>,
 )

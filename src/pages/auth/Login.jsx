@@ -5,7 +5,7 @@ import {
   Button, 
   Card, 
   Typography, 
-  message, 
+
   Space, 
   Divider,
   Layout,
@@ -20,8 +20,10 @@ import {
   LoginOutlined,
   SafetyOutlined
 } from '@ant-design/icons';
+import { App as AntApp } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { login, getPublicKey, setToken, isAuthenticated } from '@/services/auth';
+
 import JSEncrypt from 'jsencrypt';
 
 const { Title, Text } = Typography;
@@ -30,6 +32,8 @@ const { Content } = Layout;
 const Login = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const { message, notification } = AntApp.useApp();
+  
   const [publicKey, setPublicKey] = useState('');
   const navigate = useNavigate();
 
@@ -52,7 +56,6 @@ const Login = () => {
         message.error(response.message || '获取公钥失败');
       }
     } catch (error) {
-      console.error('获取公钥时出错:', error);
       message.error('获取公钥时发生错误');
     }
   };
@@ -83,19 +86,18 @@ const Login = () => {
       };
       
       const response = await login(loginData);
-      
+
       if (response.code === 200) {
         // 保存认证令牌
         setToken(response.data.token);
-        
         message.success('登录成功');
         navigate('/');
       } else {
         message.error(response.message || '登录失败');
       }
     } catch (error) {
-      console.error('登录错误:', error);
-      message.error('登录时发生错误');
+      
+      message.error('登录时发生错误: ' + error.message);
     } finally {
       setLoading(false);
     }

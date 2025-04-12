@@ -34,7 +34,7 @@ import {
 import CreateNewFeed from './components/CreateNewFeed';
 import { Link } from 'react-router-dom';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 
 const Feeds = () => {
@@ -214,7 +214,7 @@ const Feeds = () => {
       key: 'title',
       width: 300,
       render: (text, record) => (
-        <Space>
+        <Space align="start">
           <Avatar 
             src={record.logo} 
             alt={text}
@@ -224,13 +224,15 @@ const Feeds = () => {
           >
             {text.charAt(0).toUpperCase()}
           </Avatar>
-          <div>
-            <Text strong style={{ fontSize: '14px' }}>{text}</Text>
-            <div>
-              <Text type="secondary" ellipsis style={{ fontSize: '12px' }}>
-                {record.description || '暂无描述'}
-              </Text>
-            </div>
+          <div style={{ maxWidth: 240 }}>
+            <Text strong style={{ fontSize: '14px', display: 'block' }}>{text}</Text>
+            <Paragraph 
+              type="secondary" 
+              ellipsis={{ rows: 2, tooltip: record.description || '暂无描述' }}
+              style={{ fontSize: '12px', marginBottom: 0, lineHeight: '1.4' }}
+            >
+              {record.description || '暂无描述'}
+            </Paragraph>
           </div>
         </Space>
       )
@@ -300,11 +302,11 @@ const Feeds = () => {
       width: 100,
       fixed: 'right',
       render: (_, record) => (
-        <Link to={`/rss-manager/feeds/detail/${record.id}`}>
+        <a href={`/rss-manager/feeds/detail/${record.id}`} target="_blank" rel="noopener noreferrer">
           <Button type="primary" size="small" icon={<EyeOutlined />}>
             查看
           </Button>
-        </Link>
+        </a>
       ),
     },
   ];
