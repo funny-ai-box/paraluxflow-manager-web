@@ -16,7 +16,6 @@ import SyncLogs from './pages/rss/SyncLogs';
 import SyncLogDetail from './pages/rss/SyncLogs/Detail';
 import SyncAnalysis from './pages/rss/SyncAnalysis';
 
-
 // 新增爬取分析相关页面
 import CrawlerLogs from './pages/rss/CrawlerLogs';
 import CrawlerStats from './pages/rss/CrawlerStats';
@@ -30,6 +29,13 @@ import LlmModels from './pages/llm/Models';
 // Auth Pages
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
+
+// 热点话题页面
+import HotTopicsList from './pages/hot/TopicsList';
+import HotTopicsStats from './pages/hot/TopicsStats';
+import HotTasksList from './pages/hot/TasksList';
+import HotTaskDetail from './pages/hot/TaskDetail';
+import HotTopicsLogs from './pages/hot/TopicsLogs';
 
 // Create the router with direct route definitions
 const router = createBrowserRouter([
@@ -114,6 +120,28 @@ const router = createBrowserRouter([
       {
         path: '/llm/models',
         element: <LlmModels />,
+      },
+      
+      // 热点话题管理 - 新增
+      {
+        path: '/hot-topics/list',
+        element: <HotTopicsList />,
+      },
+      {
+        path: '/hot-topics/stats',
+        element: <HotTopicsStats />,
+      },
+      {
+        path: '/hot-topics/tasks',
+        element: <HotTasksList />,
+      },
+      {
+        path: '/hot-topics/tasks/:id',
+        element: <HotTaskDetail />,
+      },
+      {
+        path: '/hot-topics/logs',
+        element: <HotTopicsLogs />,
       },
       
       // 404 page

@@ -19,7 +19,8 @@ import {
   BugOutlined,
   BarChartOutlined,
   PieChartOutlined,
-  AreaChartOutlined
+  AreaChartOutlined,
+  FireOutlined
 } from '@ant-design/icons';
 import { 
   Layout, 
@@ -39,6 +40,7 @@ import {
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
 
+// 导航菜单项
 // 导航菜单项
 const menuItems = [
   {
@@ -100,6 +102,29 @@ const menuItems = [
     ],
   },
   {
+    key: 'hot-topics',
+    icon: <FireOutlined />,
+    label: '热点话题',
+    children: [
+      {
+        key: '/hot-topics/list',
+        label: '话题列表',
+      },
+      {
+        key: '/hot-topics/tasks',
+        label: '任务管理',
+      },
+      {
+        key: '/hot-topics/logs',
+        label: '爬取日志',
+      },
+      {
+        key: '/hot-topics/stats',
+        label: '统计分析',
+      },
+    ],
+  },
+  {
     key: 'llm',
     icon: <RobotOutlined />,
     label: 'LLM 管理',
@@ -126,20 +151,29 @@ const generateBreadcrumb = (pathname) => {
     '/rss-manager/sync-logs/detail': '同步日志详情',
     '/rss-manager/sync-analysis': '同步分析',
     
-    // 新增文章管理相关
+    // 文章管理相关
     '/article-manager': '文章管理',
     '/article-manager/list': '文章列表',
     
-    // 新增爬取分析相关
+    // 爬取分析相关
     '/crawler-manager': '爬取分析',
     '/crawler-manager/logs': '爬取日志',
     '/crawler-manager/stats': '统计数据',
     '/crawler-manager/analysis': '性能分析',
     '/crawler-manager/errors': '错误分析',
     
+    // LLM管理相关
     '/llm': 'LLM 管理',
     '/llm/providers': '提供商管理',
     '/llm/models': '模型管理',
+    
+    // 热点话题相关
+    '/hot-topics': '热点话题',
+    '/hot-topics/list': '话题列表',
+    '/hot-topics/tasks': '任务管理',
+    '/hot-topics/tasks/detail': '任务详情',
+    '/hot-topics/logs': '爬取日志',
+    '/hot-topics/stats': '统计分析',
   };
   
   const paths = pathname.split('/').filter(Boolean);
