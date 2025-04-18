@@ -4,217 +4,86 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   UserOutlined,
-  HomeOutlined,
-  ReadOutlined,
-  SettingOutlined,
-  AlertOutlined,
-  RobotOutlined,
+  // Icons below are now defined in router.jsx for menu items
+  // HomeOutlined, ReadOutlined, RobotOutlined, FileTextOutlined, BugOutlined, FireOutlined,
   LogoutOutlined,
   BellOutlined,
-  AppstoreOutlined,
-  HistoryOutlined,
-  LineChartOutlined,
-  SyncOutlined,
-  FileTextOutlined,
-  BugOutlined,
-  BarChartOutlined,
-  PieChartOutlined,
-  AreaChartOutlined,
-  FireOutlined
+  SettingOutlined, // Keep for Header action
+  AppstoreOutlined // Keep for Logo
 } from '@ant-design/icons';
-import { 
-  Layout, 
-  Menu, 
-  Button, 
-  theme, 
-  Avatar, 
-  Breadcrumb, 
-  Dropdown, 
-  Space, 
-  Badge, 
+import {
+  Layout,
+  Menu,
+  Button,
+  theme,
+  Avatar,
+  Breadcrumb,
+  Dropdown,
+  Space,
+  Badge,
   Typography,
   Divider,
   Tooltip
 } from 'antd';
+// Import the menu items and breadcrumb map from router.jsx
+import { layoutMenuItems, breadcrumbNameMap } from '../router'; // Adjust path if needed
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
 
-// 导航菜单项
-// 导航菜单项
-const menuItems = [
-  {
-    key: '/',
-    icon: <HomeOutlined />,
-    label: '首页',
-  },
-  {
-    key: 'rss-manager',
-    icon: <ReadOutlined />,
-    label: 'RSS 管理',
-    children: [
-      {
-        key: '/rss-manager/feeds',
-        label: '订阅源管理',
-      },
-      {
-        key: '/rss-manager/sync-logs',
-        label: '同步日志',
-      },
-      {
-        key: '/rss-manager/sync-analysis',
-        label: '同步分析',
-      },
-    ],
-  },
-  {
-    key: 'article-manager',
-    icon: <FileTextOutlined />,
-    label: '文章管理',
-    children: [
-      {
-        key: '/article-manager/list',
-        label: '文章列表',
-      },
-      {
-        key: '/article-manager/vector-search',
-        label: '向量搜索',
-      },
-    ],
-  },
-  {
-    key: 'crawler-manager',
-    icon: <BugOutlined />,
-    label: '爬取分析',
-    children: [
-      {
-        key: '/crawler-manager/logs',
-        label: '爬取日志',
-      },
-      {
-        key: '/crawler-manager/stats',
-        label: '统计数据',
-      },
-      {
-        key: '/crawler-manager/analysis',
-        label: '性能分析',
-      },
-      {
-        key: '/crawler-manager/errors',
-        label: '错误分析',
-      },
-    ],
-  },
-  {
-    key: 'hot-topics',
-    icon: <FireOutlined />,
-    label: '热点话题',
-    children: [
-      {
-        key: '/hot-topics/list',
-        label: '话题列表',
-      },
-      {
-        key: '/hot-topics/tasks',
-        label: '任务管理',
-      },
-      {
-        key: '/hot-topics/logs',
-        label: '爬取日志',
-      },
-      {
-        key: '/hot-topics/stats',
-        label: '统计分析',
-      },
-    ],
-  },
-  {
-    key: 'llm',
-    icon: <RobotOutlined />,
-    label: 'LLM 管理',
-    children: [
-      {
-        key: '/llm/providers',
-        label: '提供商管理',
-      },
-      {
-        key: '/llm/models',
-        label: '模型管理',
-      },
-    ],
-  }
-];
 
-// 生成面包屑导航
-const generateBreadcrumb = (pathname) => {
-  const breadcrumbNameMap = {
-    '/': '首页',
-    '/rss-manager': 'RSS 管理',
-    '/rss-manager/feeds': '订阅源管理',
-    '/rss-manager/sync-logs': '同步日志',
-    '/rss-manager/sync-logs/detail': '同步日志详情',
-    '/rss-manager/sync-analysis': '同步分析',
-    
-    // 文章管理相关
-    '/article-manager': '文章管理',
-    '/article-manager/list': '文章列表',
-    '/article-manager/vector-search': '向量搜索',
-    
-    // 爬取分析相关
-    '/crawler-manager': '爬取分析',
-    '/crawler-manager/logs': '爬取日志',
-    '/crawler-manager/stats': '统计数据',
-    '/crawler-manager/analysis': '性能分析',
-    '/crawler-manager/errors': '错误分析',
-    
-    // LLM管理相关
-    '/llm': 'LLM 管理',
-    '/llm/providers': '提供商管理',
-    '/llm/models': '模型管理',
-    
-    // 热点话题相关
-    '/hot-topics': '热点话题',
-    '/hot-topics/list': '话题列表',
-    '/hot-topics/tasks': '任务管理',
-    '/hot-topics/tasks/detail': '任务详情',
-    '/hot-topics/logs': '爬取日志',
-    '/hot-topics/stats': '统计分析',
-  };
-  
-  const paths = pathname.split('/').filter(Boolean);
-  
-  // 处理动态路由
-  let dynamicItemName = '';
-  if (pathname.match(/^\/rss-manager\/feeds\/detail\/\d+$/)) {
-    dynamicItemName = '订阅源详情';
-  } else if (pathname.match(/^\/rss-manager\/sync-logs\/detail\/[\w-]+$/)) {
-    dynamicItemName = '同步日志详情';
-  }
-  
-  return [
-    {
-      title: <Link to="/">首页</Link>,
-    },
-    ...paths.map((path, index) => {
-      // 计算当前路径
-      const url = `/${paths.slice(0, index + 1).join('/')}`;
-      
-      // 对于最后一级动态路由，使用动态名称
-      if (index === paths.length - 1 && dynamicItemName) {
-        return {
-          title: dynamicItemName
-        };
-      }
-      
-      // 一般路径处理
-      const title = breadcrumbNameMap[url] || path.charAt(0).toUpperCase() + path.slice(1);
-      
-      return {
-        title: index === paths.length - 1 ? title : <Link to={url}>{title}</Link>,
-      };
-    }),
-  ];
+// Helper function to find the name for a given path, including dynamic parts
+const getBreadcrumbName = (path, map) => {
+    // Direct match
+    if (map[path]) return map[path];
+
+    // Check for dynamic routes (simple case: /path/:id)
+    const pathSegments = path.split('/');
+    if (pathSegments.length > 1) {
+        const lastSegment = pathSegments[pathSegments.length - 1];
+        // Check if the last segment could be an ID (numeric or uuid-like)
+        // This is a basic check, adjust regex as needed
+        if (/^(\d+|[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12})$/.test(lastSegment)) {
+            const basePath = pathSegments.slice(0, -1).join('/');
+            const detailPathKey = `${basePath}/detail`; // Or a convention like using ':id' in the map key
+             if (map[detailPathKey]) {
+                 return map[detailPathKey];
+             }
+             // Fallback: try finding name for base path and append 'Detail'
+             if (map[basePath]) {
+                 return `${map[basePath]} 详情`;
+             }
+        }
+    }
+    return path.split('/').pop(); // Fallback to the last segment
 };
+
+
+// Generate breadcrumb items using the imported map
+const generateBreadcrumb = (pathname, map) => {
+  const paths = pathname.split('/').filter(Boolean);
+
+  const breadcrumbItems = [
+    {
+      title: <Link to="/">首页</Link>, // Always start with Home
+    },
+  ];
+
+  let currentPath = '';
+  paths.forEach((segment, index) => {
+    currentPath = `${currentPath}/${segment}`;
+    const isLast = index === paths.length - 1;
+    const name = getBreadcrumbName(currentPath, map);
+
+    breadcrumbItems.push({
+      title: isLast ? name : <Link to={currentPath}>{name}</Link>,
+    });
+  });
+
+  // Remove the first default "Home" if the path is just "/"
+  return pathname === '/' ? [breadcrumbItems[0]] : breadcrumbItems;
+};
+
 
 const MainLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -222,52 +91,69 @@ const MainLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { pathname } = location;
-  
-  // 获取应该打开的菜单项
+
+  // Get the parent path for defaultOpenKeys
   const getOpenKeys = () => {
     const segments = pathname.split('/').filter(Boolean);
-    if (segments.length > 0) {
-      return [segments[0]];
+    if (segments.length > 1) { // Only open if it's a nested route
+      return [`/${segments[0]}`]; // Return the first segment as the key (e.g., /rss-manager)
+    }
+     // If it's a top-level route like '/', it doesn't need an open key
+    if (segments.length === 1 && layoutMenuItems.some(item => item.key === `/${segments[0]}` && item.children)) {
+       return [`/${segments[0]}`];
     }
     return [];
   };
-  
-  // 获取当前选中的菜单项
+
+   // Get the current selected key, handling potential mismatches for dynamic routes
   const getSelectedKey = () => {
-    // 处理动态路由，返回父路由
-    if (pathname.match(/^\/rss-manager\/feeds\/detail\/\d+$/)) {
-      return '/rss-manager/feeds';
-    } else if (pathname.match(/^\/rss-manager\/sync-logs\/detail\/[\w-]+$/)) {
-      return '/rss-manager/sync-logs';
-    }
-    
-    return pathname;
-  };
-  
-  // 菜单点击处理
+        // Direct match check first
+        if (layoutMenuItems.some(item => item.key === pathname || (item.children && item.children.some(child => child.key === pathname)))) {
+            return pathname;
+        }
+
+        // Handle dynamic routes: find the closest matching static parent route key
+        const pathSegments = pathname.split('/');
+        for (let i = pathSegments.length; i > 1; i--) {
+            const potentialKey = pathSegments.slice(0, i).join('/');
+             // Check if this potential key exists in the menu items (either top-level or child)
+             const foundItem = layoutMenuItems.find(item => {
+                if (item.key === potentialKey) return true;
+                if (item.children) return item.children.some(child => child.key === potentialKey);
+                return false;
+            });
+            if (foundItem) {
+                return potentialKey;
+            }
+        }
+
+        // Fallback if no match found (e.g., for '/')
+        return pathname;
+    };
+
+
   const handleMenuClick = ({ key }) => {
     navigate(key);
   };
 
-  // 退出登录
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    // Assuming you store the token in localStorage
+    localStorage.removeItem('auth_token'); // Use the same key as in request.js
     navigate('/auth/login');
   };
 
-  // 用户菜单项
   const userMenuItems = [
     {
       key: 'profile',
       icon: <UserOutlined />,
       label: '个人设置',
-      onClick: () => navigate('/user/profile')
+      // onClick: () => navigate('/user/profile') // Add this route if it exists
     },
     {
       key: 'settings',
       icon: <SettingOutlined />,
       label: '系统设置',
-      onClick: () => navigate('/system/settings')
+      // onClick: () => navigate('/system/settings') // Add this route if it exists
     },
     {
       type: 'divider'
@@ -280,14 +166,13 @@ const MainLayout = () => {
     }
   ];
 
-  // 生成面包屑导航
-  const breadcrumbItems = generateBreadcrumb(pathname);
+  const breadcrumbItems = generateBreadcrumb(pathname, breadcrumbNameMap);
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider 
-        trigger={null} 
-        collapsible 
+      <Sider
+        trigger={null}
+        collapsible
         collapsed={collapsed}
         style={{
           overflow: 'auto',
@@ -302,62 +187,67 @@ const MainLayout = () => {
         theme="light"
         width={260}
       >
-        <div style={{ 
-          height: 64, 
-          display: 'flex', 
-          alignItems: 'center', 
+        <div style={{
+          height: 64,
+          display: 'flex',
+          alignItems: 'center',
           justifyContent: 'center',
           borderBottom: '1px solid #f0f0f0',
           padding: '0 16px'
         }}>
           <Link to="/" style={{ display: 'flex', alignItems: 'center' }}>
-            <AppstoreOutlined style={{ 
-              fontSize: 24, 
+            <AppstoreOutlined style={{
+              fontSize: 24,
               color: token.colorPrimary,
               marginRight: collapsed ? 0 : 12
             }} />
             {!collapsed && (
-              <Text style={{ 
-                fontSize: 18, 
+              <Text style={{
+                fontSize: 18,
                 fontWeight: 'bold',
                 color: token.colorPrimary,
-                margin: 0
+                margin: 0,
+                whiteSpace: 'nowrap' // Prevent wrapping when collapsing
               }}>
                 ParaluxFlow
               </Text>
             )}
           </Link>
         </div>
-        
+
         <Menu
           theme="light"
           mode="inline"
+          // Use defaultOpenKeys for initial render, allow user interaction to change open keys
           defaultOpenKeys={getOpenKeys()}
+          // selectedKeys needs to accurately reflect the current route or its parent
           selectedKeys={[getSelectedKey()]}
-          items={menuItems}
+          items={layoutMenuItems} // Use imported menu items
           onClick={handleMenuClick}
-          style={{ 
+          style={{
             borderRight: 0,
             padding: '12px 0'
           }}
         />
-        
-        <div style={{ 
-          position: 'absolute', 
-          bottom: 0, 
-          width: '100%', 
+
+        {/* Footer/Version info can stay if desired */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          width: '100%',
           padding: '16px',
           borderTop: '1px solid #f0f0f0',
-          textAlign: 'center'
+          textAlign: 'center',
+          background: token.colorBgContainer // Match background
         }}>
           <Text type="secondary" style={{ fontSize: '12px' }}>
             {collapsed ? 'v1.0' : 'ParaluxFlow v1.0'}
           </Text>
         </div>
       </Sider>
-      
-      <Layout style={{ 
-        marginLeft: collapsed ? 80 : 260, 
+
+      <Layout style={{
+        marginLeft: collapsed ? 80 : 260,
         transition: 'margin-left 0.2s'
       }}>
         <Header
@@ -384,58 +274,71 @@ const MainLayout = () => {
                 marginRight: 24
               }}
             />
+            {/* Use generated breadcrumb items */}
             <Breadcrumb items={breadcrumbItems} />
           </div>
-          
+
           <div style={{ display: 'flex', alignItems: 'center' }}>
+            {/* Header actions like notifications, settings, user dropdown remain */}
             <Space size={16}>
-              <Tooltip title="通知中心">
-                <Badge count={0} size="small">
-                  <Button type="text" icon={<BellOutlined />} shape="circle" />
-                </Badge>
-              </Tooltip>
-              
-              <Tooltip title="系统设置">
-                <Button 
-                  type="text" 
-                  icon={<SettingOutlined />} 
-                  shape="circle"
-                  onClick={() => navigate('/system')}
-                />
-              </Tooltip>
-              
-              <Divider type="vertical" style={{ height: 20, margin: '0 4px' }} />
-              
-              <Dropdown 
-                menu={{ items: userMenuItems }} 
+               <Tooltip title="通知中心">
+                 <Badge count={0} size="small"> {/* Placeholder count */}
+                   <Button type="text" icon={<BellOutlined />} shape="circle" />
+                 </Badge>
+               </Tooltip>
+
+               <Tooltip title="系统设置">
+                 <Button
+                   type="text"
+                   icon={<SettingOutlined />}
+                   shape="circle"
+                   // onClick={() => navigate('/system/settings')} // Link if needed
+                 />
+               </Tooltip>
+
+               <Divider type="vertical" style={{ height: 20, margin: '0 4px' }} />
+
+              <Dropdown
+                menu={{ items: userMenuItems }}
                 placement="bottomRight"
                 trigger={['click']}
               >
                 <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                  <Avatar 
-                    style={{ 
+                  <Avatar
+                    style={{
                       marginRight: 8,
-                      backgroundColor: token.colorPrimary 
-                    }} 
-                    icon={<UserOutlined />} 
+                      backgroundColor: token.colorPrimary
+                    }}
+                    icon={<UserOutlined />}
                   />
+                  {/* Dynamically display username if available */}
                   <Text style={{ marginRight: 4 }}>管理员</Text>
                 </div>
               </Dropdown>
             </Space>
           </div>
         </Header>
-        
+
         <Content
           style={{
             margin: '16px',
             minHeight: 280,
-            borderRadius: 8,
-            overflow: 'hidden',
+            // Removed fixed padding, allow Outlet content to control its padding
+            // padding: 24,
+            background: token.colorBgLayout, // Use layout background color
+            overflow: 'initial' // Let content scroll if needed
           }}
         >
-          <Outlet />
+          {/* Add a wrapper div if padding is desired around the Outlet content */}
+           <div style={{ padding: 24, background: token.colorBgContainer, borderRadius: token.borderRadiusLG, minHeight: 'calc(100vh - 64px - 32px)' }}>
+               <Outlet />
+           </div>
         </Content>
+        {/* Optional Footer
+        <Footer style={{ textAlign: 'center', background: token.colorBgLayout }}>
+          ParaluxFlow ©{new Date().getFullYear()} Created by YourTeam
+        </Footer>
+        */}
       </Layout>
     </Layout>
   );

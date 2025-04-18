@@ -43,7 +43,7 @@ export async function fetchSimilarArticles(params) {
 
 // 获取向量存储信息
 export async function fetchVectorStoreInfo(collection_name) {
-  return request('/api/admin/v1/vectorization/vector_store_info', {
+  return request('/api/admin/v1/rss/vectorization/vector_store_info', {
     method: 'GET',
     params: { collection_name }
   });

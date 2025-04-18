@@ -249,8 +249,8 @@ export default function FeedDetail() {
   const handleImageError = (e, url) => {
     if (!url) return;
     const img = e.currentTarget;
-    if (!img.src.includes('/api/admin/v1/article/proxy-image')) {
-      img.src = `/api/admin/v1/article/proxy-image?url=${encodeURIComponent(url)}`;
+    if (!img.src.includes('/api/admin/v1/rss/article/proxy-image')) {
+      img.src = `/api/admin/v1/rss/article/proxy-image?url=${encodeURIComponent(url)}`;
     } else {
       img.src = '/default-thumbnail.png';
       img.onerror = null; // 防止无限循环

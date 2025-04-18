@@ -19,7 +19,7 @@ export async function fetchRssFeedDetail(id) {
 
 // Get article content from URL
 export async function fetchArtcileHtmlByUrl(url) {
-  return request(`/api/admin/v1/article/get_content_from_url`, {
+  return request(`/api/admin/v1/rss/article/get_content_from_url`, {
     method: 'GET',
     params: { url }
   });
@@ -31,7 +31,7 @@ export async function fetchRssFeedArticles({
   page = 1,
   pageSize = 10,
 }) {
-  return request(`/api/admin/v1/article/list`, {
+  return request(`/api/admin/v1/rss/article/list`, {
     method: 'GET',
     params: {
       feed_id: id,
@@ -43,7 +43,7 @@ export async function fetchRssFeedArticles({
 
 // Sync feed articles
 export async function syncFeedArticles(id) {
-  return request(`/api/admin/v1/article/sync`, {
+  return request(`/api/admin/v1/rss/article/sync`, {
     method: 'POST',
     data: { feed_id: id }
   });
@@ -51,7 +51,7 @@ export async function syncFeedArticles(id) {
 
 // Batch sync feed articles
 export async function batchSyncFeedArticles(feed_ids) {
-  return request(`/api/admin/v1/article/batch_sync`, {
+  return request(`/api/admin/v1/rss/article/batch_sync`, {
     method: 'POST',
     data: { feed_ids }
   });
