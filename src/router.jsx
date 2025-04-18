@@ -12,6 +12,7 @@ import NotFoundPage from './pages/404';
 import Feeds from './pages/rss/Feeds';
 import FeedDetail from './pages/rss/Feeds/Detail';
 import Articles from './pages/rss/Articles';
+import VectorSearch from './pages/rss/Articles/VectorSearch';
 import SyncLogs from './pages/rss/SyncLogs';
 import SyncLogDetail from './pages/rss/SyncLogs/Detail';
 import SyncAnalysis from './pages/rss/SyncAnalysis';
@@ -79,7 +80,9 @@ const router = createBrowserRouter([
         path: '/article-manager/list',
         element: <Articles />,
       },
-      
+      {
+        path: '/article-manager/vector-search', element: <VectorSearch />,}
+      ,
       // 同步管理
       {
         path: '/rss-manager/sync-logs',

@@ -43,6 +43,28 @@ export async function getContentFromUrl(url) {
   });
 }
 
+// 新增向量化相关接口
+export async function getArticlesVectorizationStatus(article_ids) {
+  return request('/api/admin/v1/article/vectorization_status', {
+    method: 'GET',
+    params: { article_ids: article_ids.join(',') }
+  });
+}
+
+export async function resetArticleVectorization(article_id, reason) {
+  return request('/api/admin/v1/article/reset_vectorization', {
+    method: 'POST',
+    data: { article_id, reason }
+  });
+}
+
+export async function getVectorizationStatistics(feed_id) {
+  return request('/api/admin/v1/article/vectorization_statistics', {
+    method: 'GET',
+    params: { feed_id }
+  });
+}
+
 // Proxy image service
 export function getProxyImageUrl(originalUrl) {
   return `/api/admin/v1/article/proxy-image?url=${encodeURIComponent(originalUrl)}`;

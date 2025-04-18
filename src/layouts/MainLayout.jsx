@@ -76,6 +76,10 @@ const menuItems = [
         key: '/article-manager/list',
         label: '文章列表',
       },
+      {
+        key: '/article-manager/vector-search',
+        label: '向量搜索',
+      },
     ],
   },
   {
@@ -154,6 +158,7 @@ const generateBreadcrumb = (pathname) => {
     // 文章管理相关
     '/article-manager': '文章管理',
     '/article-manager/list': '文章列表',
+    '/article-manager/vector-search': '向量搜索',
     
     // 爬取分析相关
     '/crawler-manager': '爬取分析',

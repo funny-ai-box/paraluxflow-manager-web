@@ -18,7 +18,10 @@ import {
   DatePicker,
   Badge,
   Empty,
-  Tabs
+  Tabs,
+  Progress,
+  Modal,
+  Statistic
 } from 'antd';
 import { 
   SyncOutlined, 
@@ -29,12 +32,21 @@ import {
   CalendarOutlined,
   LinkOutlined,
   FilterOutlined,
-  ClearOutlined
+  ClearOutlined,
+  RocketOutlined,
+  CloseCircleOutlined
 } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import dayjs from 'dayjs';
 
-import { fetchArticleDetail, fetchArticleList, resetArticle } from '@/services/article';
+import { 
+  fetchArticleDetail, 
+  fetchArticleList, 
+  resetArticle, 
+  resetArticleVectorization,
+  getVectorizationStatistics
+} from '@/services/article';
+import { retryVectorization } from '@/services/vectorization';
 import HtmlContentViewer from '@/components/HtmlContentViewer';
 
 const { Title, Text } = Typography;
@@ -50,8 +62,29 @@ const ArticleTable = () => {
   const [searchForm] = Form.useForm();
   const [activeTabKey, setActiveTabKey] = useState('html');
   const [searchParams, setSearchParams] = useState({});
+  const [vectorStats, setVectorStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(false);
   const actionRef = useRef();
 
+  // 获取向量化统计数据
+  const fetchVectorStats = async () => {
+    setStatsLoading(true);
+    try {
+      const result = await getVectorizationStatistics();
+      if (result.code === 200) {
+        setVectorStats(result.data);
+      } else {
+        message.error(result.message || '获取向量化统计数据失败');
+      }
+    } catch (error) {
+      console.error('Error fetching vectorization stats:', error);
+      message.error('获取向量化统计数据时发生错误');
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  // 重置文章
   const handleResetArticle = async (record) => {
     try {
       const result = await resetArticle(record.id);
@@ -70,6 +103,59 @@ const ArticleTable = () => {
       message.error('重置文章时发生错误');
       return false;
     }
+  };
+
+  // 重置文章向量化
+  const handleResetVectorization = async (record) => {
+    Modal.confirm({
+      title: '重置向量化状态',
+      content: '确定要重置该文章的向量化状态吗？这将允许文章被重新向量化。',
+      onOk: async () => {
+        try {
+          const result = await resetArticleVectorization(record.id, '手动重置');
+          if (result.code === 200) {
+            message.success('文章向量化状态已重置');
+            if (actionRef.current) {
+              actionRef.current.reload();
+            }
+            fetchVectorStats();
+          } else {
+            message.error(result.message || '重置向量化状态失败');
+          }
+        } catch (error) {
+          console.error('Error resetting vectorization:', error);
+          message.error('重置向量化状态时发生错误');
+        }
+      }
+    });
+  };
+
+  // 立即执行向量化
+  const handleRetryVectorization = async (record) => {
+    Modal.confirm({
+      title: '立即执行向量化',
+      content: '确定要立即为该文章执行向量化吗？',
+      onOk: async () => {
+        try {
+          const result = await retryVectorization({
+            article_id: record.id,
+            reason: '手动执行'
+          });
+          if (result.code === 200) {
+            message.success('向量化任务已触发');
+            if (actionRef.current) {
+              actionRef.current.reload();
+            }
+            fetchVectorStats();
+          } else {
+            message.error(result.message || '触发向量化任务失败');
+          }
+        } catch (error) {
+          console.error('Error retrying vectorization:', error);
+          message.error('触发向量化任务时发生错误');
+        }
+      }
+    });
   };
 
   const handleViewContent = async (record) => {
@@ -118,6 +204,30 @@ const ArticleTable = () => {
         />
         {status === 2 && errorMessage && (
           <Tooltip title={errorMessage}>
+            <Tag color="red">错误详情</Tag>
+          </Tooltip>
+        )}
+      </Space>
+    );
+  };
+
+  // 向量化状态标签
+  const VectorizationStatusTag = ({ status, error }) => {
+    const statusMap = {
+      0: { color: 'orange', text: '待处理' },
+      1: { color: 'success', text: '成功' },
+      2: { color: 'error', text: '失败' },
+      3: { color: 'processing', text: '处理中' },
+    };
+    
+    return (
+      <Space>
+        <Badge 
+          status={statusMap[status]?.color || 'default'} 
+          text={statusMap[status]?.text || '未知'}
+        />
+        {status === 2 && error && (
+          <Tooltip title={error}>
             <Tag color="red">错误详情</Tag>
           </Tooltip>
         )}
@@ -205,7 +315,7 @@ const ArticleTable = () => {
       search: false,
     },
     {
-      title: '状态',
+      title: '处理状态',
       dataIndex: 'status',
       width: 120,
       valueEnum: {
@@ -226,6 +336,29 @@ const ArticleTable = () => {
       ],
     },
     {
+      title: '向量化状态',
+      dataIndex: 'vectorization_status',
+      width: 120,
+      valueEnum: {
+        0: { text: '待处理', status: 'warning' },
+        1: { text: '成功', status: 'success' },
+        2: { text: '失败', status: 'error' },
+        3: { text: '处理中', status: 'processing' },
+      },
+      render: (_, record) => (
+        <VectorizationStatusTag 
+          status={record.vectorization_status || 0} 
+          error={record.vectorization_error} 
+        />
+      ),
+      filters: [
+        { text: '待处理', value: 0 },
+        { text: '成功', value: 1 },
+        { text: '失败', value: 2 },
+        { text: '处理中', value: 3 },
+      ],
+    },
+    {
       title: '发布时间',
       dataIndex: 'published_date',
       valueType: 'date',
@@ -236,8 +369,20 @@ const ArticleTable = () => {
     {
       title: '操作',
       valueType: 'option',
-      width: 160,
+      width: 200,
       render: (_, record) => [
+        record.status === 1 && (
+          <Button
+            key="view"
+            type="primary"
+            size="small"
+            icon={<EyeOutlined />}
+            onClick={() => handleViewContent(record)}
+            style={{ marginRight: 8 }}
+          >
+            查看
+          </Button>
+        ),
         record.status === 2 && (
           <Button
             key="reset"
@@ -251,15 +396,28 @@ const ArticleTable = () => {
             重置
           </Button>
         ),
-        record.status === 1 && (
+        // 向量化操作按钮
+        record.status === 1 && record.vectorization_status !== 1 && (
           <Button
-            key="view"
+            key="vectorize"
             type="primary"
             size="small"
-            icon={<EyeOutlined />}
-            onClick={() => handleViewContent(record)}
+            icon={<RocketOutlined />}
+            onClick={() => handleRetryVectorization(record)}
+            style={{ marginRight: 8 }}
           >
-            查看
+            向量化
+          </Button>
+        ),
+        record.vectorization_status === 2 && (
+          <Button
+            key="resetVector"
+            size="small"
+            danger
+            icon={<CloseCircleOutlined />}
+            onClick={() => handleResetVectorization(record)}
+          >
+            重置向量
           </Button>
         ),
       ],
@@ -315,11 +473,21 @@ const ArticleTable = () => {
             </Form.Item>
           </Col>
           <Col span={6}>
+            <Form.Item name="vectorization_status" label="向量化状态">
+              <Select placeholder="请选择向量化状态" allowClear>
+                <Option value={0}>待处理</Option>
+                <Option value={1}>成功</Option>
+                <Option value={2}>失败</Option>
+                <Option value={3}>处理中</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={12}>
             <Form.Item name="date_range" label="时间范围">
               <RangePicker style={{ width: '100%' }} />
             </Form.Item>
           </Col>
-          <Col span={24} style={{ textAlign: 'right' }}>
+          <Col span={12} style={{ textAlign: 'right' }}>
             <Form.Item>
               <Space>
                 <Button 
@@ -351,6 +519,61 @@ const ArticleTable = () => {
     if (actionRef.current) {
       actionRef.current.reload();
     }
+    fetchVectorStats();
+  };
+
+  // 组件加载时获取向量化统计数据
+  React.useEffect(() => {
+    fetchVectorStats();
+  }, []);
+
+  // 向量化统计卡片
+  const renderVectorStats = () => {
+    if (!vectorStats) return null;
+    
+    return (
+      <Row gutter={16} style={{ marginBottom: 16 }}>
+        <Col span={6}>
+          <Card loading={statsLoading}>
+            <Statistic
+              title="向量化总数"
+              value={vectorStats.vectorized_articles || 0}
+              prefix={<RocketOutlined />}
+              valueStyle={{ color: '#1677ff' }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card loading={statsLoading}>
+            <Statistic
+              title="向量化率"
+              value={vectorStats.vectorization_rate || 0}
+              suffix="%"
+              precision={1}
+              valueStyle={{ color: '#3f8600' }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card loading={statsLoading}>
+            <Statistic
+              title="待处理"
+              value={vectorStats.pending_articles || 0}
+              valueStyle={{ color: '#faad14' }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card loading={statsLoading}>
+            <Statistic
+              title="失败数"
+              value={vectorStats.failed_articles || 0}
+              valueStyle={{ color: '#cf1322' }}
+            />
+          </Card>
+        </Col>
+      </Row>
+    );
   };
 
   return (
@@ -378,6 +601,10 @@ const ArticleTable = () => {
           </div>
         }
       >
+        {/* 向量化统计信息 */}
+        {renderVectorStats()}
+        
+        {/* 搜索表单 */}
         {renderSearchForm()}
         
         <ProTable
@@ -399,6 +626,11 @@ const ArticleTable = () => {
               const response = await fetchArticleList(apiParams);
               
               if (response.code === 200) {
+                // 更新向量化统计数据
+                if (response.data.vectorization_stats) {
+                  setVectorStats(response.data.vectorization_stats);
+                }
+                
                 return {
                   data: response.data.list,
                   success: true,
@@ -447,6 +679,11 @@ const ArticleTable = () => {
                 {currentArticle?.feed_title} · {currentArticle?.published_date}
               </Text>
             </div>
+            {currentArticle?.vector_id && (
+              <Tag color="blue" style={{ marginTop: 8 }}>
+                向量ID: {currentArticle.vector_id}
+              </Tag>
+            )}
           </div>
         }
         width={1200}
@@ -479,6 +716,17 @@ const ArticleTable = () => {
             } 
             key="text"
           />
+          {currentArticle?.is_vectorized && (
+            <TabPane 
+              tab={
+                <Space>
+                  <RocketOutlined />
+                  <span>向量信息</span>
+                </Space>
+              } 
+              key="vector"
+            />
+          )}
         </Tabs>
         
         <Divider style={{ margin: '0 0 16px 0' }} />
@@ -495,7 +743,7 @@ const ArticleTable = () => {
             ) : (
               <Empty description="暂无HTML内容" />
             )
-          ) : (
+          ) : activeTabKey === 'text' ? (
             <div
               style={{
                 maxWidth: '100%',
@@ -511,7 +759,36 @@ const ArticleTable = () => {
             >
               {articleContent.text_content || <Empty description="暂无文本内容" />}
             </div>
-          )}
+          ) : activeTabKey === 'vector' ? (
+            <div>
+              {currentArticle?.vector_info ? (
+                <Card title="向量信息">
+                  <Descriptions bordered column={2}>
+                    <Descriptions.Item label="向量ID" span={2}>
+                      <Text copyable>{currentArticle.vector_id}</Text>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="向量化时间">
+                      {currentArticle.vector_info.vectorized_at || '-'}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="嵌入模型">
+                      {currentArticle.vector_info.embedding_model || '-'}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="向量维度">
+                      {currentArticle.vector_info.vector_dimension || '-'}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="向量状态">
+                      <VectorizationStatusTag 
+                        status={currentArticle.vectorization_status || 0} 
+                        error={currentArticle.vectorization_error} 
+                      />
+                    </Descriptions.Item>
+                  </Descriptions>
+                </Card>
+              ) : (
+                <Empty description="暂无向量信息" />
+              )}
+            </div>
+          ) : null}
         </div>
       </Drawer>
     </div>
