@@ -9,14 +9,14 @@ export async function fetchArticleList(params = {}) {
 }
 
 export async function fetchArticleDetail(article_id) {
-  return request('/api/admin/v1/article/detail', {
+  return request('/api/admin/v1/rss/article/detail', {
     method: 'GET',
     params: { article_id }
   });
 }
 
 export async function resetArticle(article_id) {
-  return request('/api/admin/v1/article/reset', {
+  return request('/api/admin/v1/rss/article/reset', {
     method: 'POST',
     data: { article_id }
   });
